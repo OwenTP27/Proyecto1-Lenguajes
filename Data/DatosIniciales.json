@@ -1,0 +1,13 @@
+{
+  "libreria": {
+    "nombre": "Librería El Saber",
+    "telefono": "22223333",
+    "cedula_juridica": "3-101-567890",
+    "horario": "Lunes a Viernes, 8:00am - 6:00pm",
+    "siguiente_pedido": 1
+  },
+  "admin": {
+    "usuario": "admin",
+    "contrasena": "1234"
+  }
+}
