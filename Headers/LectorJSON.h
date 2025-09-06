@@ -4,9 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <cjson/cJSON.h>
 
-#define CONFIG_FILE "../Data/DatosIniciales.json"
+#define Archivo "../Data/DatosIniciales.json"
 
 typedef struct {
     char *nombre;
@@ -27,56 +26,49 @@ typedef struct {
 } Config;
 
 static Config leer_config() {
-    FILE *f = fopen(CONFIG_FILE, "r");
-    fseek(f, 0, SEEK_END);
-    long largo = ftell(f);
-    fseek(f, 0, SEEK_SET);
-
-    char *data = malloc(largo + 1);
-    fread(data, 1, largo, f);
-    data[largo] = '\0';
-    fclose(f);
-
-    cJSON *json = cJSON_Parse(data);
-    free(data);
-
-
     Config cfg;
-    cJSON *libreria = cJSON_GetObjectItem(json, "libreria");
-    cJSON *admin = cJSON_GetObjectItem(json, "admin");
-    cfg.libreria.nombre = strdup(cJSON_GetObjectItem(libreria, "nombre")->valuestring);
-    cfg.libreria.telefono = strdup(cJSON_GetObjectItem(libreria, "telefono")->valuestring);
-    cfg.libreria.cedula_juridica = strdup(cJSON_GetObjectItem(libreria, "cedula_juridica")->valuestring);
-    cfg.libreria.horario = strdup(cJSON_GetObjectItem(libreria, "horario")->valuestring);
-    cfg.libreria.siguiente_pedido = cJSON_GetObjectItem(libreria, "siguiente_pedido")->valueint;
-    cfg.admin.usuario = strdup(cJSON_GetObjectItem(admin, "usuario")->valuestring);
-    cfg.admin.contrasena = strdup(cJSON_GetObjectItem(admin, "contrasena")->valuestring);
-    cJSON_Delete(json);
+    FILE *f = fopen(Archivo, "r");
+    char line[200];
+
+    while (fgets(line, sizeof(line), f)) {
+        if (strstr(line, "\"nombre\""))
+            sscanf(line, " \"nombre\": \"%[^\"]\"", cfg.libreria.nombre);
+        else if (strstr(line, "\"telefono\""))
+            sscanf(line, " \"telefono\": \"%[^\"]\"", cfg.libreria.telefono);
+        else if (strstr(line, "\"cedula_juridica\""))
+            sscanf(line, " \"cedula_juridica\": \"%[^\"]\"", cfg.libreria.cedula_juridica);
+        else if (strstr(line, "\"horario\""))
+            sscanf(line, " \"horario\": \"%[^\"]\"", cfg.libreria.horario);
+        else if (strstr(line, "\"siguiente_pedido\""))
+            sscanf(line, " \"siguiente_pedido\": %d", &cfg.libreria.siguiente_pedido);
+        else if (strstr(line, "\"usuario\""))
+            sscanf(line, " \"usuario\": \"%[^\"]\"", cfg.admin.usuario);
+        else if (strstr(line, "\"contrasena\""))
+            sscanf(line, " \"contrasena\": \"%[^\"]\"", cfg.admin.contrasena);
+    }
+
+    fclose(f);
     return cfg;
 }
 
 
 static void cambiar(int *nuevo) {
-    FILE *f = fopen(CONFIG_FILE, "r");
-
-    fseek(f, 0, SEEK_END);
-    long largo = ftell(f);
-    fseek(f, 0, SEEK_SET);
-    char *data = malloc(largo + 1);
-    fread(data, 1, largo, f);
-    data[largo] = '\0';
+    FILE *f = fopen(Archivo, "r");
+    char line[200];
+    char buffer[5000] = "";  
+    while (fgets(line, sizeof(line), f)) {
+        if (strstr(line, "\"siguiente_pedido\"")) {
+            char nueva_linea[100];
+            sprintf(nueva_linea, "    \"siguiente_pedido\": %d,\n", *nuevo);
+            strcat(buffer, nueva_linea);
+        } else {
+            strcat(buffer, line);
+        }
+    }
     fclose(f);
-    cJSON *json = cJSON_Parse(data);
-    free(data);
-    cJSON *libreria = cJSON_GetObjectItem(json, "libreria");
-    cJSON_ReplaceItemInObject(libreria, "siguiente_pedido", cJSON_CreateNumber(*nuevo));
-    char *nuevo_json = cJSON_Print(json);
-    cJSON_Delete(json);
-
-    f = fopen(CONFIG_FILE, "w");
-    fprintf(f, "%s", nuevo_json);
+    f = fopen(Archivo, "w");
+    fputs(buffer, f);
     fclose(f);
-    free(nuevo_json);
 }
 
 #endif
