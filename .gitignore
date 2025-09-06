@@ -1,1 +1,28 @@
-/.vs
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Archivos temporales de compilación
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.log
+*.tlog
+*.idb
+*.lastbuildstate
+*.cachefile
+*.db
+*.db-shm
+*.db-wal
+
+# Carpetas de compilación
+/x64/
+/Debug/
+/Release/
+
+# Archivos de CMake (si usas)
+CMakeFiles/
+CMakeCache.txt
