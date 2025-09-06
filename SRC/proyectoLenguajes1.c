@@ -1,6 +1,6 @@
 // proyectoLenguajes1.c : Archivo principal en C.
 
-#include <stdio.h>
+#include <stdio.h>		
 
 int main()
 {
