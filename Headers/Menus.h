@@ -51,13 +51,18 @@ static void menuAdministrativo(void) {
 
 			break;
 		case 2:
-			if (login()) {
-				menuAdministrativo();
-			}
-			else {
-				printf("Acceso denegado.\n");
-			}
+
 			break;
+		case 3:
+
+			break;
+		case 4:
+
+			break;
+		case 5:
+
+			break;
+
 		case 0:
 			salir = 1;
 
