@@ -52,7 +52,7 @@ void mostrarInventario(Inventario* inventario) {
 }
 
 void guardarInventarioEnArchivo(Inventario* inventario) {
-	FILE* archivo = fopen("C:\\Users\\27owe\\Documents\\GitHub\\Proyecto1-Lenguajes\\Data\\Inventario.txt", "w");
+	FILE* archivo = fopen("Proyecto1-Lenguajes\\Data\\Inventario.txt", "w");
 	if (archivo == NULL) {
 		perror("Error al abrir el archivo");
 		return;
