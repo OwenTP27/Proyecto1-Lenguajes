@@ -3,6 +3,10 @@
 #ifndef INVENTARIO
 #define INVENTARIO
 
+// Inicializacion: Inventario* inventario = NULL;
+// Para agregar al inventario se usa la funcion agregarAlInventario() usando la referencia al inventario &inventario
+// Se debe construir el libro usando construirLibro() antes de intentar construir un inventario usando la funcion construirInventario
+// El resto de funciones actuales solo necesitan inventario como parametro excepto construirInventario que necesita un libro y su cantidad
 
 typedef struct Inventario {
 	Libro libro;
@@ -19,9 +23,20 @@ Inventario* construirInventario(Libro* nuevoLibro, int cantidadLibro) {
 
 }
 
-void agregarLibro(Inventario* inventario, Inventario* libro) {
-	inventario->siguiente = libro;
+void agregarAlInventario(Inventario** inventario, Inventario* nuevo) {
+	nuevo->siguiente = NULL;
+	if (*inventario == NULL) {
+		*inventario = nuevo;
+		return;
+	}
+
+	Inventario* actual = *inventario;
+	while (actual->siguiente != NULL) {
+		actual = actual->siguiente;
+	}
+	actual->siguiente = nuevo;
 }
+
 
 void mostrarInventario(Inventario* inventario) {
 	while (inventario != NULL) {
@@ -37,7 +52,7 @@ void mostrarInventario(Inventario* inventario) {
 }
 
 void guardarInventarioEnArchivo(Inventario* inventario) {
-	FILE* archivo = fopen("Proyecto1-Lenguajes\\Data\\Inventario.txt", "w");
+	FILE* archivo = fopen("C:\\Users\\27owe\\Documents\\GitHub\\Proyecto1-Lenguajes\\Data\\Inventario.txt", "w");
 	if (archivo == NULL) {
 		perror("Error al abrir el archivo");
 		return;
@@ -55,7 +70,7 @@ void guardarInventarioEnArchivo(Inventario* inventario) {
 		inventario = inventario->siguiente;
 	}
 
-	fclose(archivo); // cerrar archivo al terminar
+	fclose(archivo);
 }
 
 

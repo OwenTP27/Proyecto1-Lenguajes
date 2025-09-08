@@ -1,18 +1,18 @@
-Titulo: El Quijote
-Autor: Cervantes
-Precio: 29.99
-Cantidad: 5
-Codigo: L001
-
-Titulo: Cien años de soledad
+Titulo: Cien Años de Soledad
 Autor: Gabriel García Márquez
-Precio: 35.50
+Precio: 19.99
+Cantidad: 5
+Codigo: L1
+
+Titulo: El Principito
+Autor: Antoine de Saint-Exupéry
+Precio: 12.50
 Cantidad: 8
-Codigo: L002
+Codigo: L2
 
 Titulo: 1984
 Autor: George Orwell
-Precio: 19.90
-Cantidad: 12
-Codigo: L003
+Precio: 15.75
+Cantidad: 3
+Codigo: L3
 
