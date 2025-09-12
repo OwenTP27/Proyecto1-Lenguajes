@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "Headers/Inventario.h"
-
 #include "Headers/Menus.h"
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -13,7 +12,7 @@ int main()
 		printf("2. Men� Administrativo\n");
 		printf("3. Salir\n");
 		printf("Seleccione una opci�n: ");
-		scanf_s("%d", &opcion);
+		scanf("%d", &opcion);
 
 		switch (opcion) {
 		case 1:

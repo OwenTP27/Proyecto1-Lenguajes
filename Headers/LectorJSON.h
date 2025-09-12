@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define Archivo "../Data/DatosIniciales.json"
+#define Archivo "Data/DatosIniciales.json"
 
 typedef struct {
     char *nombre;
