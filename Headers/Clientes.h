@@ -89,6 +89,7 @@ void AgregarCliente(Clientes *Cliente) {
         Cliente->Cedula,
         Cliente->Nombre,
         Cliente->Telefono);
+    fclose(filePointer);
 }
 
 
@@ -108,12 +109,12 @@ Clientes SolicitarCliente (){
     while (valida == 0) {
         printf("\nIngrese el número de cédula: ");
         scanf("%9s", cliente.Cedula);
+        getchar(); 
 
         if (!existe(cliente.Cedula)) {
             printf("Ingrese el nombre: ");
-            scanf("%49[^\n]", cliente.Nombre);
-
-
+            fgets(cliente.Nombre, MAX_NOMBRE, stdin);
+            cliente.Nombre[strcspn(cliente.Nombre, "\n")] = '\0'; 
             valida=1;
             while (valida != 0){
                 printf("Ingrese el teléfono: ");

@@ -6,11 +6,11 @@ int main()
 {
 	int opcion, salir = 0;
 	while (!salir) {
-		printf("\n--- MENÚ PRINCIPAL ---\n");
-		printf("1. Menú General\n");
-		printf("2. Menú Administrativo\n");
+		printf("\n--- MENï¿½ PRINCIPAL ---\n");
+		printf("1. Menï¿½ General\n");
+		printf("2. Menï¿½ Administrativo\n");
 		printf("3. Salir\n");
-		printf("Seleccione una opción: ");
+		printf("Seleccione una opciï¿½n: ");
 		scanf_s("%d", &opcion);
 
 		switch (opcion) {
@@ -29,7 +29,7 @@ int main()
 			salir = 1;
 			break;
 		default:
-			printf("Opción no válida.\n");
+			printf("Opciï¿½n no vï¿½lida.\n");
 		}
 	}
 	return 0;
