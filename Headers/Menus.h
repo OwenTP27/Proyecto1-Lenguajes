@@ -2,6 +2,13 @@
 #define MENUS_H
 #include <stdio.h>
 #include <string.h>
+#include "Headers/Pedido.h"
+#include "Headers/Inventario.h"
+#include "Headers/Clientes.h"
+#define _CRT_SECURE_NO_WARNINGS
+ 
+
+
 void menuGeneral(void);
 void menuAdministrativo(void);
 int login(void);
@@ -54,10 +61,13 @@ static void menuAdministrativo(void) {
 
 			break;
 		case 3:
-
-			break;
+		{
+			Clientes c = SolicitarCliente();
+			printf("Cliente %s registrado correctamente.\n", c.Nombre);
+		}
+		break;
 		case 4:
-
+			registrarPedido();
 			break;
 		case 5:
 

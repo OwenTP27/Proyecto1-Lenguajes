@@ -1,5 +1,7 @@
 #ifndef LIBRO
 #define	LIBRO
+#include <stdlib.h>
+#define _CRT_SECURE_NO_WARNINGS
 
 typedef struct {
 	char *codigo;

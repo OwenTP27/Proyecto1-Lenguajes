@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "Headers/Inventario.h"
+
 #include "Headers/Menus.h"
+#define _CRT_SECURE_NO_WARNINGS
 
 int main()
 {
