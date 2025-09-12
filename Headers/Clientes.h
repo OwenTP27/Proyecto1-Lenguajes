@@ -81,10 +81,14 @@ int validarnumero(char* numero) {
 void AgregarCliente(Clientes* Cliente) {
 	FILE* filePointer = fopen("../Data/Clientes.txt", "a");
 
-	fprintf(filePointer, "%s,%s,%s\n",
-		Cliente->Cedula,
-		Cliente->Nombre,
-		Cliente->Telefono);
+
+    fprintf(filePointer, "%s,%s,%s\n",
+        Cliente->Cedula,
+        Cliente->Nombre,
+        Cliente->Telefono);
+    fclose(filePointer);
+
+
 }
 
 /*
@@ -93,6 +97,7 @@ void AgregarCliente(Clientes* Cliente) {
   Salida: un struct
   Descripcion: solicita los datos necesarios para la creacion de nuevo cliente
 */
+
 
 Clientes SolicitarCliente() {
 	Clientes cliente;
@@ -126,6 +131,7 @@ Clientes SolicitarCliente() {
 	}
 
 	return cliente;
+
 }
 
 #endif
