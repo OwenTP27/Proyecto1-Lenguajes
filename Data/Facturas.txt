@@ -1,0 +1,30 @@
+{
+  "cliente": "703080520",
+  "fecha": "13/09/2025",
+  "lineas": [
+    {"codigo": "L02", "cantidad": 6, "precio": 15000.00, "subtotal": 90000.00}
+  ],
+  "subtotal": 90000.00,
+  "total": 101700.00
+}
+
+{
+  "cliente": "703080520",
+  "fecha": "13/09/2025",
+  "lineas": [
+    {"codigo": "L01", "cantidad": 1, "precio": 1500.00, "subtotal": 1500.00}
+  ],
+  "subtotal": 1500.00,
+  "total": 1695.00
+}
+
+{
+  "cliente": "703080520",
+  "fecha": "13/09/2025",
+  "lineas": [
+    {"codigo": "L02", "cantidad": 35, "precio": 15000.00, "subtotal": 525000.00}
+  ],
+  "subtotal": 525000.00,
+  "total": 593250.00
+}
+

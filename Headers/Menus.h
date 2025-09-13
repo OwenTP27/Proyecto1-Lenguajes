@@ -35,7 +35,7 @@ static void menuGeneral(void) {
 }
 
 // ---------------- MENÚ ADMINISTRATIVO ----------------
-static void menuAdministrativo(void) {
+static void menuAdministrativo(Inventario* inventario, Pedido** pedidoActual, Pedido** listaFacturas) {
     int opcion, salir = 0;
     while (!salir) {
         printf("\n--- Menú Administrativo ---\n");
@@ -56,10 +56,10 @@ static void menuAdministrativo(void) {
             break;
         case 3: {
             Clientes c = SolicitarCliente();
-            printf("Cliente %s registrado correctamente.\n", c.Nombre);
-        } break;
+                printf("Cliente %s registrado correctamente.\n", c.Nombre);
+            } break;
         case 4:
-            registrarPedido();
+            registrarPedido(inventario, pedidoActual, listaFacturas);
             break;
         case 5:
 
@@ -73,7 +73,6 @@ static void menuAdministrativo(void) {
     }
 }
 
-// ---------------- LOGIN ----------------
 static int login(void) {
     char usuario[50], contrasena[50];
     printf("Usuario: ");
