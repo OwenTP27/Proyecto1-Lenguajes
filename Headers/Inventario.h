@@ -16,15 +16,6 @@ typedef struct Inventario {
 	struct Inventario *siguiente;
 } Inventario;
 
-Inventario* construirInventario(Libro* nuevoLibro, int cantidadLibro) {
-	Inventario *nuevoInventario = malloc(sizeof(Inventario));
-	nuevoInventario->libro = *nuevoLibro;
-	nuevoInventario->cantidad = cantidadLibro;
-	nuevoInventario->siguiente = NULL;
-	return nuevoInventario;
-
-}
-
 void agregarAlInventario(Inventario** inventario) {
     Inventario *nuevo = malloc(sizeof(Inventario));
     if (!nuevo) {
@@ -53,6 +44,7 @@ void agregarAlInventario(Inventario** inventario) {
 
 
 
+
 void mostrarInventario(Inventario* inventario) {
 	if (inventario == NULL){
 		printf("Inventario Vacio\n");
@@ -67,6 +59,62 @@ void mostrarInventario(Inventario* inventario) {
 
 		inventario = inventario->siguiente;
 	}
+}
+
+void guardarInventarioEnArchivo(Inventario* inventario) { 
+    FILE* archivo = fopen("Data/Inventario.txt", "w"); 
+    if (archivo == NULL) { 
+        perror("Error al abrir el archivo"); 
+        return; 
+    } 
+    while (inventario != NULL) { 
+        fprintf(archivo, "Titulo: %s\nAutor: %s\nPrecio: %.2f\nCantidad: %d\nCodigo: %s\n\n", 
+            inventario->libro.nombre, 
+            inventario->libro.autor, 
+            inventario->libro.precio, 
+            inventario->cantidad, 
+            inventario->libro.codigo); 
+            inventario = inventario->siguiente; 
+    } 
+    fclose(archivo); 
+}
+
+void cambiarCantidad(Inventario* inventario) {
+    if (inventario == NULL){
+        printf("Inventario Vacio\n");
+        return;
+    }
+
+    int cantidad;
+    char* codigo;
+    Inventario* inicio = inventario;//puntero al inicio de inventario
+
+    printf("Ingresa el codigo del Libro: ");
+    codigo = lecturaD();
+
+    printf("Ingresa la cantidad del movimiento: ");
+    scanf("%d", &cantidad);
+    while (getchar() != '\n');//limpiar buffer
+
+    while (inventario != NULL) {
+        if (strcmp(codigo, inventario->libro.codigo) == 0) {
+            if (inventario->cantidad + cantidad < 0) {
+                printf("Stock insuficiente\n");
+            } else {
+                inventario->cantidad += cantidad;
+                printf("Cambio en stock realizado\n");
+                if (inicio !=NULL){
+                    guardarInventarioEnArchivo(inicio);
+                }
+            }
+            free(codigo);
+            return;
+        }
+        inventario = inventario->siguiente;
+    }
+
+    printf("Libro con código %s no encontrado\n", codigo);
+    free(codigo);
 }
 
 void cargarInventario(Inventario** inventario) {
@@ -146,6 +194,34 @@ void cargarInventario(Inventario** inventario) {
     }
 
     fclose(archivo);
+}
+
+char* lecturaD() {
+    int c;
+    char *string = malloc(1);
+    string[0] = '\0';
+	int i = 0;
+	while ((c = getchar()) != '\n' && c != EOF) {
+		string = realloc(string, i + 2);
+		string[i] = (char)c;
+		string[i+1] = '\0';
+		i++;
+	}
+
+    return string;
+}
+
+#include <string.h>
+#include <ctype.h>
+
+void rtrim(char *str) {
+    if (str == NULL) return;
+
+    int len = strlen(str);
+    while (len > 0 && isspace((unsigned char)str[len - 1])) {
+        str[len - 1] = '\0'; // reemplaza espacio con fin de cadena
+        len--;
+    }
 }
 
 char* lecturaD() {
