@@ -75,21 +75,25 @@ void trim(char* str) {
     }
 }
 
-// Liberar memoria de líneas
-void liberarLineas(LineaPedido* linea) {
-    while (linea) {
-        LineaPedido* tmp = linea;
-        linea = linea->siguiente;
-        free(tmp);
+void liberarFacturas(Pedido* listaFacturas) {
+    Pedido* act = listaFacturas;
+    while (act) {
+        Pedido* tmp = act;
+        act = act->siguiente;
+        liberarPedido(tmp);
+    }
+}
+// Liberar toda la lista de facturas
+void liberarFacturas(Pedido* listaFacturas) {
+    Pedido* act = listaFacturas;
+    while (act) {
+        Pedido* tmp = act;
+        act = act->siguiente;
+        liberarPedido(tmp);
     }
 }
 
-// Liberar pedido completo
-void liberarPedido(Pedido* pedido) {
-    if (!pedido) return;
-    liberarLineas(pedido->lineas);
-    free(pedido);
-}
+
 
 // Mostrar carrito
 void verLineas(Pedido* p) {
@@ -389,7 +393,13 @@ void registrarPedido(Inventario* inventario, Pedido** pedidoActual, Pedido** lis
                 case 1: agregarLibro(inventario, *pedidoActual); break;
                 case 2: eliminarLibro(*pedidoActual); break;
                 case 3: generarPedido(inventario, pedidoActual, listaFacturas); salir = 1; break;
-                case 0: salir = 1; break;
+                case 0: 
+                    if (*pedidoActual) {
+                        liberarPedido(*pedidoActual);
+                        *pedidoActual = NULL;
+                    }
+                    salir = 1;
+                    break;
                 default: printf("Opción no válida.\n"); break;
             }
         }

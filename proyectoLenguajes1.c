@@ -36,6 +36,8 @@ int main()
 			break;
 		case 3:
 			salir = 1;
+			     if (pedidoActual) liberarPedido(pedidoActual);
+                liberarFacturas(listaFacturas);
 			break;
 		default:
 			printf("Opci�n no v�lida.\n");
