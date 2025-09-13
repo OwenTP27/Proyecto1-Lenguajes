@@ -1,18 +1,12 @@
-Titulo: Cien Años de Soledad
-Autor: Gabriel García Márquez
-Precio: 19.99
-Cantidad: 5
-Codigo: L1
-
-Titulo: El Principito
-Autor: Antoine de Saint-Exupéry
-Precio: 12.50
-Cantidad: 8
-Codigo: L2
+Titulo: Soledad
+Autor: Solis
+Precio: 1500.00
+Cantidad: 20
+Codigo: L01
 
 Titulo: 1984
-Autor: George Orwell
-Precio: 15.75
-Cantidad: 3
-Codigo: L3
+Autor: Orwell
+Precio: 15000.00
+Cantidad: 40
+Codigo: L02
 
