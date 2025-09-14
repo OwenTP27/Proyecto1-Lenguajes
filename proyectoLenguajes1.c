@@ -29,7 +29,7 @@ int main()
 			break;
 		case 2:
 			if (login(&info)) {
-				menuAdministrativo(inventario,&pedidoActual, &listaFacturas);
+				menuAdministrativo(inventario,&pedidoActual, &listaFacturas,&info);
 			}
 			else {
 				printf("Acceso denegado.\n");

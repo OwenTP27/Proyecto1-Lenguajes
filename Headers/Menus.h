@@ -9,6 +9,7 @@
 
 // ---------------- MENÚ GENERAL ----------------
 static void menuGeneral(Pedido* pedidoActual, Pedido** listaFacturas) {
+    mostrarencabezado(leer_config());
     int opcion, salir = 0;
     while (!salir) {
         printf("\n--- Opciones Administrativas ---\n");
@@ -35,9 +36,10 @@ static void menuGeneral(Pedido* pedidoActual, Pedido** listaFacturas) {
 }
 
 // ---------------- MENÚ ADMINISTRATIVO ----------------
-static void menuAdministrativo(Inventario* inventario, Pedido** pedidoActual, Pedido** listaFacturas) {
+static void menuAdministrativo(Inventario* inventario, Pedido** pedidoActual, Pedido** listaFacturas, Config* info) {
     int opcion, salir = 0;
     while (!salir) {
+        mostrarencabezado(leer_config());
         printf("\n--- Menú Administrativo ---\n");
         printf("1. Registrar libros\n");
         printf("2. Manejo de inventario\n");
@@ -59,14 +61,14 @@ static void menuAdministrativo(Inventario* inventario, Pedido** pedidoActual, Pe
                 printf("Cliente %s registrado correctamente.\n", c.Nombre);
             } break;
         case 4:
-            registrarPedido(inventario, pedidoActual, listaFacturas);
+            registrarPedido(inventario, pedidoActual, listaFacturas, &info);
             break;
         case 5:
 
             break;
         case 0:
             salir = 1;
-            break;
+            break;          
         default:
             printf("Opción no válida.\n");
         }
@@ -81,9 +83,15 @@ static int login(Config* info) {
     scanf("%49s", contrasena);
 
     if (strcmp(usuario, info->admin.usuario) == 0 && strcmp(contrasena, info->admin.contrasena) == 0) {
+        printf("Login exitoso.\n");
+        limpiarPantalla();
         return 1;
     }
+    else {
+        printf("Usuario o contraseña incorrectos.\n");
+    }
+    limpiarPantalla();
     return 0;
 }
 
-#endif
+#endif  
