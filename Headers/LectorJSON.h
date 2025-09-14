@@ -7,7 +7,7 @@
 
 #define Archivo "Data/DatosIniciales.json"
 
-typedef struct {
+typedef struct Libreria {
     char *nombre;
     char *telefono;
     char *cedula_juridica;
@@ -15,21 +15,40 @@ typedef struct {
     int siguiente_pedido;
 } Libreria;
 
-typedef struct {
+typedef struct Admin {
     char *usuario;
     char *contrasena;
 } Admin;
 
-typedef struct {
+typedef struct Config {
     Libreria libreria;
     Admin admin;
 } Config;
 
 static Config leer_config() {
     Config cfg;
-    FILE *f = fopen(Archivo, "r");
-    char line[200];
 
+    
+    cfg.libreria.nombre = malloc(100);
+    cfg.libreria.telefono = malloc(20);
+    cfg.libreria.cedula_juridica = malloc(20);
+    cfg.libreria.horario = malloc(100);
+    cfg.admin.usuario = malloc(50);
+    cfg.admin.contrasena = malloc(50);
+
+    if (!cfg.libreria.nombre || !cfg.libreria.telefono || !cfg.libreria.cedula_juridica ||
+        !cfg.libreria.horario || !cfg.admin.usuario || !cfg.admin.contrasena) {
+        fprintf(stderr, "Error al reservar memoria\n");
+        exit(1);
+    }
+
+    FILE *f = fopen(Archivo, "r");
+    if (!f) {
+        perror("No se pudo abrir el archivo");
+        exit(1);
+    }
+
+    char line[200];
     while (fgets(line, sizeof(line), f)) {
         if (strstr(line, "\"nombre\""))
             sscanf(line, " \"nombre\": \"%[^\"]\"", cfg.libreria.nombre);
@@ -51,11 +70,15 @@ static Config leer_config() {
     return cfg;
 }
 
-
 static void cambiar(int *nuevo) {
     FILE *f = fopen(Archivo, "r");
+    if (!f) {
+        perror("No se pudo abrir el archivo para leer");
+        exit(1);
+    }
+
     char line[200];
-    char buffer[5000] = "";  
+    char buffer[5000] = "";
     while (fgets(line, sizeof(line), f)) {
         if (strstr(line, "\"siguiente_pedido\"")) {
             char nueva_linea[100];
@@ -66,9 +89,24 @@ static void cambiar(int *nuevo) {
         }
     }
     fclose(f);
+
     f = fopen(Archivo, "w");
+    if (!f) {
+        perror("No se pudo abrir el archivo para escribir");
+        exit(1);
+    }
     fputs(buffer, f);
     fclose(f);
+}
+
+// Liberar memoria
+static void liberar_config(Config *cfg) {
+    free(cfg->libreria.nombre);
+    free(cfg->libreria.telefono);
+    free(cfg->libreria.cedula_juridica);
+    free(cfg->libreria.horario);
+    free(cfg->admin.usuario);
+    free(cfg->admin.contrasena);
 }
 
 #endif

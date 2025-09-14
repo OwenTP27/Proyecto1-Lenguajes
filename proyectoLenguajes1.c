@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "Headers/Inventario.h"
 #include "Headers/Menus.h"
+#include "Headers/LectorJSON.h"
 #define _CRT_SECURE_NO_WARNINGS
 
 int main()
@@ -9,9 +10,8 @@ int main()
 	Pedido* pedidoActual = NULL;
 	Pedido* listaFacturas = NULL;
 	cargarInventario(&inventario);
-	
 	cargarFacturas(&listaFacturas);
-	
+	Config info = leer_config();
 	imprimirFacturas(listaFacturas);
 	int opcion, salir = 0;
 	while (!salir) {
@@ -24,10 +24,11 @@ int main()
 
 		switch (opcion) {
 		case 1:
-			menuGeneral();
+			menuGeneral(pedidoActual, &listaFacturas);
+
 			break;
 		case 2:
-			if (login()) {
+			if (login(&info)) {
 				menuAdministrativo(inventario,&pedidoActual, &listaFacturas);
 			}
 			else {
@@ -38,6 +39,7 @@ int main()
 			salir = 1;
 			     if (pedidoActual) liberarPedido(pedidoActual);
                 liberarFacturas(listaFacturas);
+				liberar_config(&info);
 			break;
 		default:
 			printf("Opci�n no v�lida.\n");

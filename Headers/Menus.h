@@ -73,14 +73,14 @@ static void menuAdministrativo(Inventario* inventario, Pedido** pedidoActual, Pe
     }
 }
 
-static int login(void) {
+static int login(Config* info) {
     char usuario[50], contrasena[50];
     printf("Usuario: ");
     scanf("%49s", usuario);
     printf("Contraseña: ");
     scanf("%49s", contrasena);
 
-    if (strcmp(usuario, "admin") == 0 && strcmp(contrasena, "1234") == 0) {
+    if (strcmp(usuario, info->admin.usuario) == 0 && strcmp(contrasena, info->admin.contrasena) == 0) {
         return 1;
     }
     return 0;

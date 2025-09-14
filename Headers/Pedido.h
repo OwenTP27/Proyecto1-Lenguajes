@@ -7,6 +7,7 @@
 #include <time.h>
 #include "Inventario.h"
 #include "Clientes.h"
+#include "LectorJSON.h"
 
 #define ARCHIVO_FACTURAS "Data/Facturas.txt"
 #define MAX_LINEA 256
