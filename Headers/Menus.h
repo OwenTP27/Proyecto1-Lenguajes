@@ -8,7 +8,7 @@
 #include "Clientes.h"
 
 // ---------------- MENÚ GENERAL ----------------
-static void menuGeneral(void) {
+static void menuGeneral(Pedido* pedidoActual, Pedido** listaFacturas) {
     int opcion, salir = 0;
     while (!salir) {
         printf("\n--- Opciones Administrativas ---\n");
