@@ -5,14 +5,14 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 int main()
-{ 	
+{ 	limpiarPantalla();
 	Inventario* inventario = NULL;
 	Pedido* pedidoActual = NULL;
 	Pedido* listaFacturas = NULL;
 	cargarInventario(&inventario);
 	cargarFacturas(&listaFacturas);
 	Config info = leer_config();
-	imprimirFacturas(listaFacturas);
+	//imprimirFacturas(listaFacturas);
 	int opcion, salir = 0;
 	while (!salir) {
 		printf("\n--- MENÚ PRINCIPAL ---\n");
@@ -24,6 +24,7 @@ int main()
 
 		switch (opcion) {
 		case 1:
+		
 			menuGeneral(pedidoActual, &listaFacturas);
 
 			break;

@@ -9,9 +9,11 @@
 
 // ---------------- MENÚ GENERAL ----------------
 static void menuGeneral(Pedido* pedidoActual, Pedido** listaFacturas) {
-    mostrarencabezado(leer_config());
+   
     int opcion, salir = 0;
     while (!salir) {
+         limpiarPantalla();
+    mostrarencabezado(leer_config());
         printf("\n--- Opciones Administrativas ---\n");
         printf("1. Consulta de catálogo\n");
         printf("2. Consulta de cliente\n");
@@ -37,9 +39,11 @@ static void menuGeneral(Pedido* pedidoActual, Pedido** listaFacturas) {
 
 // ---------------- MENÚ ADMINISTRATIVO ----------------
 static void menuAdministrativo(Inventario* inventario, Pedido** pedidoActual, Pedido** listaFacturas, Config* info) {
+    
     int opcion, salir = 0;
     while (!salir) {
-        mostrarencabezado(leer_config());
+         limpiarPantalla();
+    mostrarencabezado(leer_config());
         printf("\n--- Menú Administrativo ---\n");
         printf("1. Registrar libros\n");
         printf("2. Manejo de inventario\n");
