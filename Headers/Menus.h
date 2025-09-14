@@ -8,9 +8,12 @@
 #include "Clientes.h"
 
 // ---------------- MENÚ GENERAL ----------------
-static void menuGeneral(void) {
+static void menuGeneral(Pedido* pedidoActual, Pedido** listaFacturas) {
+   
     int opcion, salir = 0;
     while (!salir) {
+         limpiarPantalla();
+    mostrarencabezado(leer_config());
         printf("\n--- Opciones Administrativas ---\n");
         printf("1. Consulta de catálogo\n");
         printf("2. Consulta de cliente\n");
@@ -35,9 +38,12 @@ static void menuGeneral(void) {
 }
 
 // ---------------- MENÚ ADMINISTRATIVO ----------------
-static void menuAdministrativo(Inventario* inventario, Pedido** pedidoActual, Pedido** listaFacturas) {
+static void menuAdministrativo(Inventario* inventario, Pedido** pedidoActual, Pedido** listaFacturas, Config* info) {
+    
     int opcion, salir = 0;
     while (!salir) {
+         limpiarPantalla();
+    mostrarencabezado(leer_config());
         printf("\n--- Menú Administrativo ---\n");
         printf("1. Registrar libros\n");
         printf("2. Manejo de inventario\n");
@@ -59,31 +65,37 @@ static void menuAdministrativo(Inventario* inventario, Pedido** pedidoActual, Pe
                 printf("Cliente %s registrado correctamente.\n", c.Nombre);
             } break;
         case 4:
-            registrarPedido(inventario, pedidoActual, listaFacturas);
+            registrarPedido(inventario, pedidoActual, listaFacturas, &info);
             break;
         case 5:
 
             break;
         case 0:
             salir = 1;
-            break;
+            break;          
         default:
             printf("Opción no válida.\n");
         }
     }
 }
 
-static int login(void) {
+static int login(Config* info) {
     char usuario[50], contrasena[50];
     printf("Usuario: ");
     scanf("%49s", usuario);
     printf("Contraseña: ");
     scanf("%49s", contrasena);
 
-    if (strcmp(usuario, "admin") == 0 && strcmp(contrasena, "1234") == 0) {
+    if (strcmp(usuario, info->admin.usuario) == 0 && strcmp(contrasena, info->admin.contrasena) == 0) {
+        printf("Login exitoso.\n");
+        limpiarPantalla();
         return 1;
     }
+    else {
+        printf("Usuario o contraseña incorrectos.\n");
+    }
+    limpiarPantalla();
     return 0;
 }
 
-#endif
+#endif  
