@@ -16,15 +16,6 @@ typedef struct Inventario {
 	struct Inventario *siguiente;
 } Inventario;
 
-Inventario* construirInventario(Libro* nuevoLibro, int cantidadLibro) {
-	Inventario *nuevoInventario = malloc(sizeof(Inventario));
-	nuevoInventario->libro = *nuevoLibro;
-	nuevoInventario->cantidad = cantidadLibro;
-	nuevoInventario->siguiente = NULL;
-	return nuevoInventario;
-
-}
-
 void agregarAlInventario(Inventario** inventario) {
     Inventario *nuevo = malloc(sizeof(Inventario));
     if (!nuevo) {
@@ -68,6 +59,112 @@ void mostrarInventario(Inventario* inventario) {
 		inventario = inventario->siguiente;
 	}
 }
+
+void guardarInventarioEnArchivo(Inventario* inventario) { 
+    FILE* archivo = fopen("Data/Inventario.txt", "w"); 
+    if (archivo == NULL) { 
+        perror("Error al abrir el archivo"); 
+        return; 
+    } 
+    while (inventario != NULL) { 
+        fprintf(archivo, "Titulo: %s\nAutor: %s\nPrecio: %.2f\nCantidad: %d\nCodigo: %s\n\n", 
+            inventario->libro.nombre, 
+            inventario->libro.autor, 
+            inventario->libro.precio, 
+            inventario->cantidad, 
+            inventario->libro.codigo); 
+            inventario = inventario->siguiente; 
+    } 
+    fclose(archivo); 
+}
+
+void cambiarCantidad(Inventario* inventario) {
+    if (inventario == NULL){
+        printf("Inventario Vacio\n");
+        return;
+    }
+
+    int cantidad;
+    char* codigo;
+    Inventario* inicio = inventario;//puntero al inicio de inventario
+
+    printf("Ingresa el codigo del Libro: ");
+    codigo = lecturaD();
+
+    printf("Ingresa la cantidad del movimiento: ");
+    scanf("%d", &cantidad);
+    while (getchar() != '\n');//limpiar buffer
+
+    while (inventario != NULL) {
+        if (strcmp(codigo, inventario->libro.codigo) == 0) {
+            if (inventario->cantidad + cantidad < 0) {
+                printf("Stock insuficiente\n");
+            } else {
+                inventario->cantidad += cantidad;
+                printf("Cambio en stock realizado\n");
+                if (inicio !=NULL){
+                    guardarInventarioEnArchivo(inicio);
+                }
+            }
+            free(codigo);
+            return;
+        }
+        inventario = inventario->siguiente;
+    }
+
+    printf("Libro con código %s no encontrado\n", codigo);
+    free(codigo);
+}
+
+void cargaInventarioPorArchivo(Inventario* inventario) {
+    FILE* archivo = fopen("Data/Carga.txt", "r");
+    if (!archivo) {
+        perror("No se pudo abrir el archivo");
+        return;
+    }
+
+    char linea[256];
+    int numeroLinea = 0;
+
+    while (fgets(linea, sizeof(linea), archivo)) {
+        numeroLinea++;
+
+        char codigo[100];
+        int cantidad;
+
+        if (sscanf(linea, "%99[^,],%d", codigo, &cantidad) != 2) {
+            printf("Línea %d: Formato inválido -> %s", numeroLinea, linea);
+            continue;
+        }
+
+        Inventario* actual = inventario;
+        int encontrado = 0;
+
+        while (actual != NULL) {
+            if (strcmp(actual->libro.codigo, codigo) == 0) {
+                encontrado = 1;
+                if (actual->cantidad + cantidad < 0) {
+                    printf("Línea %d: Stock insuficiente para código %s (actual %d, intento %d)\n",
+                           numeroLinea, codigo, actual->cantidad, cantidad);
+                } else {
+                    actual->cantidad += cantidad;
+                    printf("Línea %d: Actualizado %s, nueva cantidad %d\n",
+                           numeroLinea, codigo, actual->cantidad);
+                }
+                break;
+            }
+            actual = actual->siguiente;
+        }
+
+        if (!encontrado) {
+            printf("Línea %d: Código %s no encontrado en inventario\n", numeroLinea, codigo);
+        }
+    }
+
+    fclose(archivo);
+    guardarInventarioEnArchivo(inventario);
+}
+
 
 void cargarInventario(Inventario** inventario) {
     FILE* archivo = fopen("Data/Inventario.txt", "r");
@@ -162,5 +259,6 @@ char* lecturaD() {
 
     return string;
 }
+
 
 #endif // !"INVENTARIO"
