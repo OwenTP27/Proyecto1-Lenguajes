@@ -44,7 +44,6 @@ void agregarAlInventario(Inventario** inventario) {
 
 
 
-
 void mostrarInventario(Inventario* inventario) {
 	if (inventario == NULL){
 		printf("Inventario Vacio\n");
@@ -116,6 +115,56 @@ void cambiarCantidad(Inventario* inventario) {
     printf("Libro con código %s no encontrado\n", codigo);
     free(codigo);
 }
+
+void cargaInventarioPorArchivo(Inventario* inventario) {
+    FILE* archivo = fopen("Data/Carga.txt", "r");
+    if (!archivo) {
+        perror("No se pudo abrir el archivo");
+        return;
+    }
+
+    char linea[256];
+    int numeroLinea = 0;
+
+    while (fgets(linea, sizeof(linea), archivo)) {
+        numeroLinea++;
+
+        char codigo[100];
+        int cantidad;
+
+        if (sscanf(linea, "%99[^,],%d", codigo, &cantidad) != 2) {
+            printf("Línea %d: Formato inválido -> %s", numeroLinea, linea);
+            continue;
+        }
+
+        Inventario* actual = inventario;
+        int encontrado = 0;
+
+        while (actual != NULL) {
+            if (strcmp(actual->libro.codigo, codigo) == 0) {
+                encontrado = 1;
+                if (actual->cantidad + cantidad < 0) {
+                    printf("Línea %d: Stock insuficiente para código %s (actual %d, intento %d)\n",
+                           numeroLinea, codigo, actual->cantidad, cantidad);
+                } else {
+                    actual->cantidad += cantidad;
+                    printf("Línea %d: Actualizado %s, nueva cantidad %d\n",
+                           numeroLinea, codigo, actual->cantidad);
+                }
+                break;
+            }
+            actual = actual->siguiente;
+        }
+
+        if (!encontrado) {
+            printf("Línea %d: Código %s no encontrado en inventario\n", numeroLinea, codigo);
+        }
+    }
+
+    fclose(archivo);
+    guardarInventarioEnArchivo(inventario);
+}
+
 
 void cargarInventario(Inventario** inventario) {
     FILE* archivo = fopen("Data/Inventario.txt", "r");
@@ -211,32 +260,5 @@ char* lecturaD() {
     return string;
 }
 
-#include <string.h>
-#include <ctype.h>
-
-void rtrim(char *str) {
-    if (str == NULL) return;
-
-    int len = strlen(str);
-    while (len > 0 && isspace((unsigned char)str[len - 1])) {
-        str[len - 1] = '\0'; // reemplaza espacio con fin de cadena
-        len--;
-    }
-}
-
-char* lecturaD() {
-    int c;
-    char *string = malloc(1);
-    string[0] = '\0';
-	int i = 0;
-	while ((c = getchar()) != '\n' && c != EOF) {
-		string = realloc(string, i + 2);
-		string[i] = (char)c;
-		string[i+1] = '\0';
-		i++;
-	}
-
-    return string;
-}
 
 #endif // !"INVENTARIO"
