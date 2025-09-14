@@ -9,7 +9,7 @@ int main()
 	Pedido* pedidoActual = NULL;
 	Pedido* listaFacturas = NULL;
 	cargarInventario(&inventario);
-	printf("DEBUG: listaFacturas=%p\n", (void*)listaFacturas);
+	
 	cargarFacturas(&listaFacturas);
 	
 	imprimirFacturas(listaFacturas);
