@@ -18,7 +18,8 @@ int main()
 		printf("\n--- MENÚ PRINCIPAL ---\n");
 		printf("1. Menú General\n");
 		printf("2. Menú Administrativo\n");
-		printf("3. Salir\n");
+		printf("3. Menú de Extras\n");
+		printf("4. Salir\n");
 		printf("Seleccione una opción: ");
 		scanf("%d", &opcion);
 
@@ -37,14 +38,14 @@ int main()
 			}
 			break;
 		case 3:
+			MenuExtras(pedidoActual, &listaFacturas, inventario);
+			break;
+		case 4:
 			salir = 1;
-			     if (pedidoActual) liberarPedido(pedidoActual);
-                liberarFacturas(listaFacturas);
-				liberar_config(&info);
-				
+			
 			break;
 		default:
-			printf("Opci�n no v�lida.\n");
+			printf("Opción no válida.\n");
 		}
 	}
 	return 0;

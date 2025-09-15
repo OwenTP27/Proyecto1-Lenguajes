@@ -1,70 +1,5 @@
 {
   "cliente": "703080520",
-  "fecha": "14/09/2025",
-  "id": 1,
-  "lineas": [
-    {"codigo": "L02", "cantidad": 5, "precio": 15000.00, "subtotal": 75000.00}
-  ],
-  "subtotal": 75000.00,
-  "total": 84750.00
-}
-
-{
-  "cliente": "703080520",
-  "fecha": "14/09/2025",
-  "id": 1,
-  "lineas": [
-    {"codigo": "L02", "cantidad": 6, "precio": 15000.00, "subtotal": 90000.00}
-  ],
-  "subtotal": 90000.00,
-  "total": 101700.00
-}
-
-{
-  "cliente": "703080520",
-  "fecha": "15/09/2025",
-  "id": 1,
-  "lineas": [
-  ],
-  "subtotal": 0.00,
-  "total": 0.00
-}
-
-{
-  "cliente": "703080520",
-  "fecha": "15/09/2025",
-  "id": 1,
-  "lineas": [
-    {"codigo": "L02", "cantidad": 5, "precio": 15000.00, "subtotal": 75000.00}
-  ],
-  "subtotal": 75000.00,
-  "total": 84750.00
-}
-
-{
-  "cliente": "703080520",
-  "fecha": "15/09/2025",
-  "id": 1,
-  "lineas": [
-    {"codigo": "L02", "cantidad": 5, "precio": 15000.00, "subtotal": 75000.00}
-  ],
-  "subtotal": 75000.00,
-  "total": 84750.00
-}
-
-{
-  "cliente": "703080520",
-  "fecha": "15/09/2025",
-  "id": 2,
-  "lineas": [
-    {"codigo": "L02", "cantidad": 5, "precio": 15000.00, "subtotal": 75000.00}
-  ],
-  "subtotal": 75000.00,
-  "total": 84750.00
-}
-
-{
-  "cliente": "703080520",
   "fecha": "15/09/2025",
   "id": 3,
   "lineas": [
@@ -83,5 +18,16 @@
   ],
   "subtotal": 15000.00,
   "total": 16950.00
+}
+
+{
+  "cliente": "703080520",
+  "fecha": "15/09/2025",
+  "id": 5,
+  "lineas": [
+    {"codigo": "L02", "cantidad": 3, "precio": 15000.00, "subtotal": 45000.00}
+  ],
+  "subtotal": 45000.00,
+  "total": 50850.00
 }
 
