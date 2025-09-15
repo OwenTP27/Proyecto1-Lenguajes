@@ -70,9 +70,7 @@ static void menuAdministrativo(Inventario* inventario, Pedido** pedidoActual, Pe
 
         switch (opcion) {
         case 1:
-
-            break;
-       
+            agregarAlInventario(&inventario);
             break;
         case 3: {
             Clientes c = SolicitarCliente();
@@ -153,7 +151,7 @@ static void MenuExtras(Pedido* pedidoActual, Pedido** listaFacturas, Inventario*
 
         switch (opcion) {
         case 1:
-
+            validarEliminacion(*listaFacturas, &inventario);
             break;
         case 2:
             

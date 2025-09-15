@@ -1,14 +1,9 @@
 #include "Libro.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "Pedido.h"
 #ifndef INVENTARIO
 #define INVENTARIO
-
-// Inicializacion: Inventario* inventario = NULL;
-// Inicializacion: cargarInventario(&inventario);
-// Para agregar al inventario se usa la funcion agregarAlInventario() usando la referencia al inventario &inventario
-// Se debe construir el libro usando construirLibro() antes de intentar construir un inventario usando la funcion construirInventario
-// El resto de funciones actuales solo necesitan inventario como parametro excepto construirInventario que necesita un libro y su cantidad
 
 typedef struct Inventario {
 	Libro libro;
@@ -16,61 +11,33 @@ typedef struct Inventario {
 	struct Inventario *siguiente;
 } Inventario;
 
-void agregarAlInventario(Inventario** inventario) {
-    Inventario *nuevo = malloc(sizeof(Inventario));
-    if (!nuevo) {
-        perror("malloc");
-        exit(1);
-    }
-    nuevo->siguiente = NULL;
-
-    nuevo->libro = construirLibro();
-
-    printf("Ingresa la cantidad en Inventario: ");
-    scanf("%d", &nuevo->cantidad);
-    while (getchar() != '\n');  // limpiar el buffer
-
-    if (*inventario == NULL) {
-        *inventario = nuevo;
+/**
+ * guardarEnHistorial
+ * Guarda la información básica del libro (codigo, nombre, autor) en el archivo HistorialLibros.txt
+ * Entradas: Libro libro
+ * Retorno: ninguno
+ */
+void guardarEnHistorial(Libro libro) {
+    FILE* archivo = fopen("Data/HistorialLibros.txt", "a");
+    if (archivo == NULL) {
+        perror("Error al abrir Historial.txt");
         return;
     }
 
-    Inventario* actual = *inventario;
-    while (actual->siguiente != NULL) {
-        actual = actual->siguiente;
-    }
-    actual->siguiente = nuevo;
+    fprintf(archivo, "%s, %s, %s\n",
+            libro.codigo,
+            libro.nombre,
+            libro.autor);
+
+    fclose(archivo);
 }
 
-void mostrarInventario(Inventario* inventario) {
-    if (inventario == NULL) {
-        printf("Inventario Vacío\n");
-        return;
-    }
-
-    // Encabezado de la tabla
-    printf("-------------------------------------------------------------------------------------\n");
-    printf("| %-20s | %-15s | %-10s | %-8s | %-10s |\n",
-           "Título", "Autor", "Precio", "Cantidad", "Código");
-    printf("-------------------------------------------------------------------------------------\n");
-
-    // Filas de la tabla
-    while (inventario != NULL) {
-        printf("| %-20s | %-15s | %-10.2f | %-8d | %-10s |\n",
-               inventario->libro.nombre,
-               inventario->libro.autor,
-               inventario->libro.precio,
-               inventario->cantidad,
-               inventario->libro.codigo);
-
-        inventario = inventario->siguiente;
-    }
-
-    // Línea final
-    printf("-------------------------------------------------------------------------------------\n");
-}
-
-
+/**
+ * guardarInventarioEnArchivo
+ * Guarda todo el inventario en el archivo Inventario.txt
+ * Entradas: Inventario* inventario
+ * Retorno: ninguno
+ */
 void guardarInventarioEnArchivo(Inventario* inventario) { 
     FILE* archivo = fopen("Data/Inventario.txt", "w"); 
     if (archivo == NULL) { 
@@ -78,24 +45,30 @@ void guardarInventarioEnArchivo(Inventario* inventario) {
         return; 
     } 
     while (inventario != NULL) { 
-        fprintf(archivo, "Titulo: %s\nAutor: %s\nPrecio: %.2f\nCantidad: %d\nCodigo: %s\n\n", 
+        fprintf(archivo, "%s,%s,%s,%.2f,%d\n", 
+            inventario->libro.codigo, 
             inventario->libro.nombre, 
             inventario->libro.autor, 
             inventario->libro.precio, 
-            inventario->cantidad, 
-            inventario->libro.codigo); 
-            inventario = inventario->siguiente; 
+            inventario->cantidad); 
+        inventario = inventario->siguiente; 
     } 
     fclose(archivo); 
 }
 
+/**
+ * cambiarCantidad
+ * Modifica la cantidad de un libro en el inventario dado su código
+ * Entradas: Inventario* inventario, char* codigo, int cantidad (puede ser negativo para disminuir stock)
+ * Retorno: ninguno
+ */
 void cambiarCantidad(Inventario* inventario, char* codigo, int cantidad) {
     if (inventario == NULL){
         printf("Inventario Vacio\n");
         return;
     }
 
-    Inventario* inicio = inventario;//puntero al inicio de inventario
+    Inventario* inicio = inventario;
 
     while (inventario != NULL) {
         if (strcmp(codigo, inventario->libro.codigo) == 0) {
@@ -116,7 +89,119 @@ void cambiarCantidad(Inventario* inventario, char* codigo, int cantidad) {
     printf("Libro con código %s no encontrado\n", codigo);
 }
 
-void eliminarLibroIventario(Inventario** inventario, char* codigo) {
+/**
+ * agregarAlInventario
+ * Agrega un nuevo libro al inventario (se construye con construirLibro)
+ * Entradas: Inventario** inventario (puntero al puntero del inicio de la lista)
+ * Retorno: ninguno
+ */
+void agregarAlInventario(Inventario** inventario) {
+    Inventario *nuevo = malloc(sizeof(Inventario));
+    if (!nuevo) {
+        perror("malloc");
+        exit(1);
+    }
+    nuevo->siguiente = NULL;
+
+    nuevo->libro = construirLibro();
+    guardarEnHistorial(nuevo->libro);
+
+    printf("Ingresa la cantidad en Inventario: ");
+    scanf("%d", &nuevo->cantidad);
+    while (getchar() != '\n');  // limpiar el buffer
+
+    if (*inventario == NULL) {
+        *inventario = nuevo;
+        guardarInventarioEnArchivo(*inventario);
+        return;
+    }
+
+    Inventario* actual = *inventario;
+    while (actual->siguiente != NULL) {
+        actual = actual->siguiente;
+    }
+    actual->siguiente = nuevo;
+    guardarInventarioEnArchivo(*inventario);
+}
+
+/**
+ * mostrarInventario
+ * Muestra el inventario en formato de tabla
+ * Entradas: Inventario* inventario
+ * Retorno: ninguno
+ */
+void mostrarInventario(Inventario* inventario) {
+    if (inventario == NULL) {
+        printf("Inventario Vacío\n");
+        return;
+    }
+
+    printf("-------------------------------------------------------------------------------------\n");
+    printf("| %-20s | %-15s | %-10s | %-8s | %-10s |\n",
+           "Título", "Autor", "Precio", "Cantidad", "Código");
+    printf("-------------------------------------------------------------------------------------\n");
+
+    while (inventario != NULL) {
+        printf("| %-20s | %-15s | %-10.2f | %-8d | %-10s |\n",
+               inventario->libro.nombre,
+               inventario->libro.autor,
+               inventario->libro.precio,
+               inventario->cantidad,
+               inventario->libro.codigo);
+
+        inventario = inventario->siguiente;
+    }
+
+    printf("-------------------------------------------------------------------------------------\n");
+}
+
+
+/**
+ * validarEliminacion
+ * Recorre todos los pedidos y sus líneas buscando un código de libro.
+ * Si no se encuentra en ningún pedido, se llama a eliminarLibroInventario.
+ * Entradas:
+ *   Pedido* pedidos: lista de todos los pedidos
+ *   Inventario** inventario: puntero al inventario
+ */
+void validarEliminacion(Pedido* pedidos, Inventario** inventario) {
+    if (!pedidos) {
+        printf("No hay pedidos registrados.\n");
+        return;
+    }
+
+    printf("Ingrese el código del libro a eliminar: ");
+    char* input = lecturaD();
+
+    int encontrado = 0;
+
+    Pedido* pActual = pedidos;
+    while (pActual != NULL && !encontrado) {
+        LineaPedido* linea = pActual->lineas;
+        while (linea != NULL) {
+            if (strcmp(linea->codigoLibro, input) == 0) {
+                encontrado = 1;
+                break; // libro encontrado en algún pedido
+            }
+            linea = linea->siguiente;
+        }
+        pActual = pActual->siguiente;
+    }
+
+    if (!encontrado) {
+        eliminarLibroInventario(inventario, input);
+    } else {
+        printf("El libro con código %s se encuentra en algún pedido y no puede eliminarse.\n", input);
+    }
+    free(input);
+}
+/**
+ * eliminarLibroInventario
+ * Elimina un libro del inventario dado su código
+ * Entradas: Inventario** inventario, char* codigo
+ * Retorno: ninguno
+ */
+void eliminarLibroInventario(Inventario** inventario, char* codigo) {
     if (*inventario == NULL) {
         printf("Inventario vacío\n");
         return;
@@ -127,10 +212,8 @@ void eliminarLibroIventario(Inventario** inventario, char* codigo) {
 
     while (actual != NULL) {
         if (strcmp(codigo, actual->libro.codigo) == 0) {
-            //Caso: Se elimina el primer nodo
             if (anterior == NULL) {
                 *inventario = actual->siguiente;
-            //Caso: Se elimina algun otro nodo
             } else {
                 anterior->siguiente = actual->siguiente;
             }
@@ -138,7 +221,6 @@ void eliminarLibroIventario(Inventario** inventario, char* codigo) {
             free(actual->libro.codigo);
             free(actual->libro.nombre);
             free(actual->libro.autor);
-
             free(actual);
 
             guardarInventarioEnArchivo(*inventario);
@@ -153,6 +235,12 @@ void eliminarLibroIventario(Inventario** inventario, char* codigo) {
     printf("Libro con código %s no encontrado en inventario\n", codigo);
 }
 
+/**
+ * cargaInventarioPorArchivo
+ * Carga cambios de inventario desde un archivo Data/Carga.txt
+ * Entradas: Inventario* inventario
+ * Retorno: ninguno
+ */
 void cargaInventarioPorArchivo(Inventario* inventario) {
     FILE* archivo = fopen("Data/Carga.txt", "r");
     if (!archivo) {
@@ -202,8 +290,13 @@ void cargaInventarioPorArchivo(Inventario* inventario) {
     guardarInventarioEnArchivo(inventario);
 }
 
-
-void cargarInventario(Inventario** inventario) {
+/**
+ * cargarInventarioDesdeArchivo
+ * Carga todo el inventario desde Data/Inventario.txt
+ * Entradas: Inventario** inventario
+ * Retorno: ninguno
+ */
+void cargarInventarioDesdeArchivo(Inventario** inventario) {
     FILE* archivo = fopen("Data/Inventario.txt", "r");
     if (archivo == NULL) {
         perror("Error al abrir el archivo");
@@ -212,90 +305,66 @@ void cargarInventario(Inventario** inventario) {
 
     char linea[256];
     while (fgets(linea, sizeof(linea), archivo)) {
-        Inventario* nuevo = malloc(sizeof(Inventario));
-        if (!nuevo) {
-            perror("malloc");
-            fclose(archivo);
-            return;
-        }
-        nuevo->siguiente = NULL;
+        linea[strcspn(linea, "\n")] = 0;
 
-        Libro libro;
+        char codigo[50], nombre[100], autor[100];
+        float precio;
+        int cantidad;
 
-        //Lectura Titulo
-        if (strncmp(linea, "Titulo:", 7) == 0) {
-            char* valor = linea + 7; // saltar "Titulo:"
-            while (*valor == ' ') valor++; // quitar espacios
-            valor[strcspn(valor, "\n")] = 0; // quitar salto de línea
-            libro.nombre = strdup(valor);
-        }
+        if (sscanf(linea, "%49[^,],%99[^,],%99[^,],%f,%d",
+                   codigo, nombre, autor, &precio, &cantidad) == 5) {
+            Libro nuevoLibro;
+            nuevoLibro.codigo = strdup(codigo);
+            nuevoLibro.nombre = strdup(nombre);
+            nuevoLibro.autor  = strdup(autor);
+            nuevoLibro.precio = precio;
 
-        //Lectura Autor
-        fgets(linea, sizeof(linea), archivo);
-        if (strncmp(linea, "Autor:", 6) == 0) {
-            char* valor = linea + 6;
-            while (*valor == ' ') valor++;
-            valor[strcspn(valor, "\n")] = 0;
-            libro.autor = strdup(valor);
-        }
-
-        //Lectura Precio
-        fgets(linea, sizeof(linea), archivo);
-        if (strncmp(linea, "Precio:", 7) == 0) {
-            char* valor = linea + 7;
-            libro.precio = atof(valor);
-        }
-
-        //Lectura Cantidad
-        fgets(linea, sizeof(linea), archivo);
-        if (strncmp(linea, "Cantidad:", 9) == 0) {
-            char* valor = linea + 9;
-            nuevo->cantidad = atoi(valor);
-        }
-
-        //Lectura Codigo
-        fgets(linea, sizeof(linea), archivo);
-        if (strncmp(linea, "Codigo:", 7) == 0) {
-            char* valor = linea + 7;
-            while (*valor == ' ') valor++;
-            valor[strcspn(valor, "\n")] = 0;
-            libro.codigo = strdup(valor);
-        }
-
-        nuevo->libro = libro;
-
-        // saltar línea en blanco entre libros
-        fgets(linea, sizeof(linea), archivo);
-
-        // insertar al final de la lista
-        if (*inventario == NULL) {
-            *inventario = nuevo;
-        } else {
-            Inventario* actual = *inventario;
-            while (actual->siguiente != NULL) {
-                actual = actual->siguiente;
+            Inventario* nuevo = malloc(sizeof(Inventario));
+            if (!nuevo) {
+                perror("malloc");
+                fclose(archivo);
+                return;
             }
-            actual->siguiente = nuevo;
+            nuevo->libro = nuevoLibro;
+            nuevo->cantidad = cantidad;
+            nuevo->siguiente = NULL;
+
+            if (*inventario == NULL) {
+                *inventario = nuevo;
+            } else {
+                Inventario* actual = *inventario;
+                while (actual->siguiente != NULL) {
+                    actual = actual->siguiente;
+                }
+                actual->siguiente = nuevo;
+            }
+        } else {
+            printf("Línea inválida en archivo: %s\n", linea);
         }
     }
 
     fclose(archivo);
 }
 
+/**
+ * lecturaD
+ * Lee una cadena desde la entrada estándar (stdin) con tamaño dinámico
+ * Entradas: ninguna
+ * Retorno: char* puntero a cadena leída (dinámicamente asignada)
+ */
 char* lecturaD() {
     int c;
     char *string = malloc(1);
     string[0] = '\0';
-	int i = 0;
-	while ((c = getchar()) != '\n' && c != EOF) {
-		string = realloc(string, i + 2);
-		string[i] = (char)c;
-		string[i+1] = '\0';
-		i++;
-	}
+    int i = 0;
+    while ((c = getchar()) != '\n' && c != EOF) {
+        string = realloc(string, i + 2);
+        string[i] = (char)c;
+        string[i+1] = '\0';
+        i++;
+    }
 
     return string;
 }
 
-
-#endif // !"INVENTARIO"
+#endif // !INVENTARIO
