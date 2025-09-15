@@ -375,7 +375,7 @@ void generarPedido(Inventario* inventario, Pedido** pedidoActual, Pedido** lista
 
     while (aux) {
         subtotal += aux->cantidad * aux->precio;
-
+        
         Inventario* libro = inventario;
         while (libro) {
             if (strcmp(libro->libro.codigo, aux->codigoLibro) == 0) {
