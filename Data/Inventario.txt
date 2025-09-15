@@ -1,9 +1,3 @@
-Titulo: Soledad
-Autor: Solis
-Precio: 1500.00
-Cantidad: 55
-Codigo: L01
-
 Titulo: 1984
 Autor: Orwell
 Precio: 15000.00

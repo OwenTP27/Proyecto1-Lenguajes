@@ -42,23 +42,34 @@ void agregarAlInventario(Inventario** inventario) {
     actual->siguiente = nuevo;
 }
 
-
-
 void mostrarInventario(Inventario* inventario) {
-	if (inventario == NULL){
-		printf("Inventario Vacio\n");
-	}
-	while (inventario != NULL) {
-		printf("\nTitulo: %s\nAutor: %s\nPrecio: %.2f\nCantidad: %d\nCodigo: %s\n",
-			inventario->libro.nombre,
-			inventario->libro.autor,
-			inventario->libro.precio,
-			inventario->cantidad,
-			inventario->libro.codigo);
+    if (inventario == NULL) {
+        printf("Inventario Vacío\n");
+        return;
+    }
 
-		inventario = inventario->siguiente;
-	}
+    // Encabezado de la tabla
+    printf("-------------------------------------------------------------------------------------\n");
+    printf("| %-20s | %-15s | %-10s | %-8s | %-10s |\n",
+           "Título", "Autor", "Precio", "Cantidad", "Código");
+    printf("-------------------------------------------------------------------------------------\n");
+
+    // Filas de la tabla
+    while (inventario != NULL) {
+        printf("| %-20s | %-15s | %-10.2f | %-8d | %-10s |\n",
+               inventario->libro.nombre,
+               inventario->libro.autor,
+               inventario->libro.precio,
+               inventario->cantidad,
+               inventario->libro.codigo);
+
+        inventario = inventario->siguiente;
+    }
+
+    // Línea final
+    printf("-------------------------------------------------------------------------------------\n");
 }
+
 
 void guardarInventarioEnArchivo(Inventario* inventario) { 
     FILE* archivo = fopen("Data/Inventario.txt", "w"); 
@@ -78,22 +89,13 @@ void guardarInventarioEnArchivo(Inventario* inventario) {
     fclose(archivo); 
 }
 
-void cambiarCantidad(Inventario* inventario) {
+void cambiarCantidad(Inventario* inventario, char* codigo, int cantidad) {
     if (inventario == NULL){
         printf("Inventario Vacio\n");
         return;
     }
 
-    int cantidad;
-    char* codigo;
     Inventario* inicio = inventario;//puntero al inicio de inventario
-
-    printf("Ingresa el codigo del Libro: ");
-    codigo = lecturaD();
-
-    printf("Ingresa la cantidad del movimiento: ");
-    scanf("%d", &cantidad);
-    while (getchar() != '\n');//limpiar buffer
 
     while (inventario != NULL) {
         if (strcmp(codigo, inventario->libro.codigo) == 0) {
@@ -106,14 +108,49 @@ void cambiarCantidad(Inventario* inventario) {
                     guardarInventarioEnArchivo(inicio);
                 }
             }
-            free(codigo);
             return;
         }
         inventario = inventario->siguiente;
     }
 
     printf("Libro con código %s no encontrado\n", codigo);
-    free(codigo);
+}
+
+void eliminarLibro(Inventario** inventario, char* codigo) {
+    if (*inventario == NULL) {
+        printf("Inventario vacío\n");
+        return;
+    }
+
+    Inventario* actual = *inventario;
+    Inventario* anterior = NULL;
+
+    while (actual != NULL) {
+        if (strcmp(codigo, actual->libro.codigo) == 0) {
+            //Caso: Se elimina el primer nodo
+            if (anterior == NULL) {
+                *inventario = actual->siguiente;
+            //Caso: Se elimina algun otro nodo
+            } else {
+                anterior->siguiente = actual->siguiente;
+            }
+
+            free(actual->libro.codigo);
+            free(actual->libro.nombre);
+            free(actual->libro.autor);
+
+            free(actual);
+
+            guardarInventarioEnArchivo(*inventario);
+            printf("Libro con código %s eliminado del inventario\n", codigo);
+            return;
+        }
+
+        anterior = actual;
+        actual = actual->siguiente;
+    }
+
+    printf("Libro con código %s no encontrado en inventario\n", codigo);
 }
 
 void cargaInventarioPorArchivo(Inventario* inventario) {
