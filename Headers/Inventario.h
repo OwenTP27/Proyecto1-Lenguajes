@@ -16,60 +16,20 @@ typedef struct Inventario {
 	struct Inventario *siguiente;
 } Inventario;
 
-void agregarAlInventario(Inventario** inventario) {
-    Inventario *nuevo = malloc(sizeof(Inventario));
-    if (!nuevo) {
-        perror("malloc");
-        exit(1);
-    }
-    nuevo->siguiente = NULL;
-
-    nuevo->libro = construirLibro();
-
-    printf("Ingresa la cantidad en Inventario: ");
-    scanf("%d", &nuevo->cantidad);
-    while (getchar() != '\n');  // limpiar el buffer
-
-    if (*inventario == NULL) {
-        *inventario = nuevo;
+void guardarEnHistorial(Libro libro) {
+    FILE* archivo = fopen("Data/HistorialLibros.txt", "a");
+    if (archivo == NULL) {
+        perror("Error al abrir Historial.txt");
         return;
     }
 
-    Inventario* actual = *inventario;
-    while (actual->siguiente != NULL) {
-        actual = actual->siguiente;
-    }
-    actual->siguiente = nuevo;
+    fprintf(archivo, "%s, %s, %s\n",
+            libro.codigo,
+            libro.nombre,
+            libro.autor);
+
+    fclose(archivo);
 }
-
-void mostrarInventario(Inventario* inventario) {
-    if (inventario == NULL) {
-        printf("Inventario Vacío\n");
-        return;
-    }
-
-    // Encabezado de la tabla
-    printf("-------------------------------------------------------------------------------------\n");
-    printf("| %-20s | %-15s | %-10s | %-8s | %-10s |\n",
-           "Título", "Autor", "Precio", "Cantidad", "Código");
-    printf("-------------------------------------------------------------------------------------\n");
-
-    // Filas de la tabla
-    while (inventario != NULL) {
-        printf("| %-20s | %-15s | %-10.2f | %-8d | %-10s |\n",
-               inventario->libro.nombre,
-               inventario->libro.autor,
-               inventario->libro.precio,
-               inventario->cantidad,
-               inventario->libro.codigo);
-
-        inventario = inventario->siguiente;
-    }
-
-    // Línea final
-    printf("-------------------------------------------------------------------------------------\n");
-}
-
 
 void guardarInventarioEnArchivo(Inventario* inventario) { 
     FILE* archivo = fopen("Data/Inventario.txt", "w"); 
@@ -78,13 +38,13 @@ void guardarInventarioEnArchivo(Inventario* inventario) {
         return; 
     } 
     while (inventario != NULL) { 
-        fprintf(archivo, "Titulo: %s\nAutor: %s\nPrecio: %.2f\nCantidad: %d\nCodigo: %s\n\n", 
+        fprintf(archivo, "%s,%s,%s,%.2f,%d\n", 
+            inventario->libro.codigo, 
             inventario->libro.nombre, 
             inventario->libro.autor, 
             inventario->libro.precio, 
-            inventario->cantidad, 
-            inventario->libro.codigo); 
-            inventario = inventario->siguiente; 
+            inventario->cantidad); 
+        inventario = inventario->siguiente; 
     } 
     fclose(archivo); 
 }
@@ -116,7 +76,64 @@ void cambiarCantidad(Inventario* inventario, char* codigo, int cantidad) {
     printf("Libro con código %s no encontrado\n", codigo);
 }
 
-void eliminarLibroIventario(Inventario** inventario, char* codigo) {
+void agregarAlInventario(Inventario** inventario) {
+    Inventario *nuevo = malloc(sizeof(Inventario));
+    if (!nuevo) {
+        perror("malloc");
+        exit(1);
+    }
+    nuevo->siguiente = NULL;
+
+    nuevo->libro = construirLibro();
+    guardarEnHistorial(nuevo->libro);
+
+    printf("Ingresa la cantidad en Inventario: ");
+    scanf("%d", &nuevo->cantidad);
+    while (getchar() != '\n');  // limpiar el buffer
+
+    if (*inventario == NULL) {
+        *inventario = nuevo;
+        guardarInventarioEnArchivo(*inventario);
+        return;
+    }
+
+    Inventario* actual = *inventario;
+    while (actual->siguiente != NULL) {
+        actual = actual->siguiente;
+    }
+    actual->siguiente = nuevo;
+    guardarInventarioEnArchivo(*inventario);
+}
+
+void mostrarInventario(Inventario* inventario) {
+    if (inventario == NULL) {
+        printf("Inventario Vacío\n");
+        return;
+    }
+
+    // Encabezado de la tabla
+    printf("-------------------------------------------------------------------------------------\n");
+    printf("| %-20s | %-15s | %-10s | %-8s | %-10s |\n",
+           "Título", "Autor", "Precio", "Cantidad", "Código");
+    printf("-------------------------------------------------------------------------------------\n");
+
+    // Filas de la tabla
+    while (inventario != NULL) {
+        printf("| %-20s | %-15s | %-10.2f | %-8d | %-10s |\n",
+               inventario->libro.nombre,
+               inventario->libro.autor,
+               inventario->libro.precio,
+               inventario->cantidad,
+               inventario->libro.codigo);
+
+        inventario = inventario->siguiente;
+    }
+
+    // Línea final
+    printf("-------------------------------------------------------------------------------------\n");
+}
+
+void eliminarLibroInventario(Inventario** inventario, char* codigo) {
     if (*inventario == NULL) {
         printf("Inventario vacío\n");
         return;
@@ -203,7 +220,7 @@ void cargaInventarioPorArchivo(Inventario* inventario) {
 }
 
 
-void cargarInventario(Inventario** inventario) {
+void cargarInventarioDesdeArchivo(Inventario** inventario) {
     FILE* archivo = fopen("Data/Inventario.txt", "r");
     if (archivo == NULL) {
         perror("Error al abrir el archivo");
@@ -212,75 +229,51 @@ void cargarInventario(Inventario** inventario) {
 
     char linea[256];
     while (fgets(linea, sizeof(linea), archivo)) {
-        Inventario* nuevo = malloc(sizeof(Inventario));
-        if (!nuevo) {
-            perror("malloc");
-            fclose(archivo);
-            return;
-        }
-        nuevo->siguiente = NULL;
+        // Eliminar salto de línea
+        linea[strcspn(linea, "\n")] = 0;
 
-        Libro libro;
+        char codigo[50], nombre[100], autor[100];
+        float precio;
+        int cantidad;
 
-        //Lectura Titulo
-        if (strncmp(linea, "Titulo:", 7) == 0) {
-            char* valor = linea + 7; // saltar "Titulo:"
-            while (*valor == ' ') valor++; // quitar espacios
-            valor[strcspn(valor, "\n")] = 0; // quitar salto de línea
-            libro.nombre = strdup(valor);
-        }
+        if (sscanf(linea, "%49[^,],%99[^,],%99[^,],%f,%d",
+                   codigo, nombre, autor, &precio, &cantidad) == 5) {
+            //Creacion libro
+            Libro nuevoLibro;
+            nuevoLibro.codigo = strdup(codigo);
+            nuevoLibro.nombre = strdup(nombre);
+            nuevoLibro.autor  = strdup(autor);
+            nuevoLibro.precio = precio;
 
-        //Lectura Autor
-        fgets(linea, sizeof(linea), archivo);
-        if (strncmp(linea, "Autor:", 6) == 0) {
-            char* valor = linea + 6;
-            while (*valor == ' ') valor++;
-            valor[strcspn(valor, "\n")] = 0;
-            libro.autor = strdup(valor);
-        }
-
-        //Lectura Precio
-        fgets(linea, sizeof(linea), archivo);
-        if (strncmp(linea, "Precio:", 7) == 0) {
-            char* valor = linea + 7;
-            libro.precio = atof(valor);
-        }
-
-        //Lectura Cantidad
-        fgets(linea, sizeof(linea), archivo);
-        if (strncmp(linea, "Cantidad:", 9) == 0) {
-            char* valor = linea + 9;
-            nuevo->cantidad = atoi(valor);
-        }
-
-        //Lectura Codigo
-        fgets(linea, sizeof(linea), archivo);
-        if (strncmp(linea, "Codigo:", 7) == 0) {
-            char* valor = linea + 7;
-            while (*valor == ' ') valor++;
-            valor[strcspn(valor, "\n")] = 0;
-            libro.codigo = strdup(valor);
-        }
-
-        nuevo->libro = libro;
-
-        // saltar línea en blanco entre libros
-        fgets(linea, sizeof(linea), archivo);
-
-        // insertar al final de la lista
-        if (*inventario == NULL) {
-            *inventario = nuevo;
-        } else {
-            Inventario* actual = *inventario;
-            while (actual->siguiente != NULL) {
-                actual = actual->siguiente;
+            // Creacion Nodo
+            Inventario* nuevo = malloc(sizeof(Inventario));
+            if (!nuevo) {
+                perror("malloc");
+                fclose(archivo);
+                return;
             }
-            actual->siguiente = nuevo;
+            nuevo->libro = nuevoLibro;
+            nuevo->cantidad = cantidad;
+            nuevo->siguiente = NULL;
+
+            // Insertar al final de la lista
+            if (*inventario == NULL) {
+                *inventario = nuevo;
+            } else {
+                Inventario* actual = *inventario;
+                while (actual->siguiente != NULL) {
+                    actual = actual->siguiente;
+                }
+                actual->siguiente = nuevo;
+            }
+        } else {
+            printf("Línea inválida en archivo: %s\n", linea);
         }
     }
 
     fclose(archivo);
 }
+
 
 char* lecturaD() {
     int c;
