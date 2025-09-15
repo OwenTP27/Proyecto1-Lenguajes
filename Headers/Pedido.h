@@ -570,6 +570,99 @@ void imprimirFacturas(Pedido* listaFacturas) {
 }
 
 
+int comparar (char *a, char *b) {
+    int i = 0;
+    while (a[i] != '\0' && b[i] != '\0') {
+        if (a[i] != b[i]) {
+            return 0;
+        }
+        i++;
+    }
+    return a[i] == b[i];
+}
+
+void consultarCLiente(Pedido* listaFacturas){
+    if (!listaFacturas) {
+        printf("Ningun cliente ha facturado.\n");
+        return;
+    }
+    printf("\n");
+    printf("\n--- Consulta de Clientes y sus Facturas ---\n");
+    int total = 0;
+    Clientes *lista = LeerClientes(&total);
+    for (int i = 0; i < total; i++) {
+        printf("\n");
+        printf("Cédula: %s  Nombre: %s Teléfono: %s\n", lista[i].Cedula, lista[i].Nombre, lista[i].Telefono);
+        lista[i].Cedula;
+        int vacio = 0;
+        Pedido* factura = listaFacturas;
+        while (factura) {
+            if (comparar(factura->cedulaCliente, lista[i].Cedula)) {
+                vacio = 1;
+                int total = 0;
+                LineaPedido* linea = factura->lineas;
+                while (linea) {
+                    total += linea->cantidad;
+                    linea = linea->siguiente;
+                }
+                printf("  - Factura ID: %d | Fecha: %s | Cantidad de libros: %d | Subtotal: %.2f | Total: %.2f\n", factura->id, factura->fecha,total,factura->subtotal ,factura->total);
+            }
+            factura = factura->siguiente;   
+        }
+        if (vacio == 0) {
+            printf("  - No ha realizado facturas.\n");
+        }
+
+    }
+    free(lista); 
+}
+
+
+
+void EliminarCliente(Pedido* listaFacturas){
+
+    int total = 0;
+    Clientes *lista = LeerClientes(&total);
+
+    if (total == 0 ){
+        printf("No hay clientes registrados.\n");
+        return;
+    }
+    printf("\n--- Eliminar Cliente ---\n");
+
+    for (int i = 0; i < total; i++) {
+        printf("%d) Cédula: %s  Nombre: %s Teléfono: %s\n", i+1, lista[i].Cedula, lista[i].Nombre, lista[i].Telefono);
+    }
+    printf("Seleccione un numero del 1 al %d: ", total);
+    int opcion;
+    scanf("%d", &opcion);
+    printf("\n");
+
+    if (opcion < 1 || opcion > total) {
+        printf("Opción inválida.\n");
+        free(lista);
+        return;
+    }
+    if (!listaFacturas) {
+        BorrarCliente(lista[opcion-1].Cedula);
+        printf("Cliente eliminado con exito.\n");
+        return;
+    }
+    Pedido* factura = listaFacturas;
+    int encontro = 0;
+    while (factura) {
+            if (comparar(factura->cedulaCliente, lista[opcion-1].Cedula)) {
+                encontro = 1;
+                printf("Cliente no se pudo eliminar debido a que ha facturado.\n");
+                return;
+            }
+            factura = factura->siguiente;   
+        }
+    BorrarCliente(lista[opcion-1].Cedula);
+    printf("Cliente eliminado con exito.\n");
+    free(lista);
+}
+
 
 
 #endif // PEDIDO_H
