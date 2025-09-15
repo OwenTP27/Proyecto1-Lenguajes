@@ -12,6 +12,22 @@ typedef struct Inventario {
 } Inventario;
 
 /**
+ * liberarInventario
+ * Funcion para liberar la memoria usada en la lista enlazada
+ * Entradas: puntero al inventario
+ * Retorno: ninguno
+ */
+void liberarInventario(Inventario* inventario) {
+    Inventario* actual = inventario;
+    while (actual != NULL) {
+        Inventario* siguiente = actual->siguiente; // guardar siguiente nodo
+        free(actual); // liberar el nodo actual
+        actual = siguiente; // pasar al siguiente
+    }
+}
+
+
+/**
  * guardarEnHistorial
  * Guarda la información básica del libro (codigo, nombre, autor) en el archivo HistorialLibros.txt
  * Entradas: Libro libro
@@ -24,7 +40,7 @@ void guardarEnHistorial(Libro libro) {
         return;
     }
 
-    fprintf(archivo, "%s, %s, %s\n",
+    fprintf(archivo, "%s,%s,%s\n",
             libro.codigo,
             libro.nombre,
             libro.autor);
@@ -155,46 +171,6 @@ void mostrarInventario(Inventario* inventario) {
     printf("-------------------------------------------------------------------------------------\n");
 }
 
-
-/**
- * validarEliminacion
- * Recorre todos los pedidos y sus líneas buscando un código de libro.
- * Si no se encuentra en ningún pedido, se llama a eliminarLibroInventario.
- * Entradas:
- *   Pedido* pedidos: lista de todos los pedidos
- *   Inventario** inventario: puntero al inventario
- */
-void validarEliminacion(Pedido* pedidos, Inventario** inventario) {
-    if (!pedidos) {
-        printf("No hay pedidos registrados.\n");
-        return;
-    }
-
-    printf("Ingrese el código del libro a eliminar: ");
-    char* input = lecturaD();
-
-    int encontrado = 0;
-
-    Pedido* pActual = pedidos;
-    while (pActual != NULL && !encontrado) {
-        LineaPedido* linea = pActual->lineas;
-        while (linea != NULL) {
-            if (strcmp(linea->codigoLibro, input) == 0) {
-                encontrado = 1;
-                break; // libro encontrado en algún pedido
-            }
-            linea = linea->siguiente;
-        }
-        pActual = pActual->siguiente;
-    }
-
-    if (!encontrado) {
-        eliminarLibroInventario(inventario, input);
-    } else {
-        printf("El libro con código %s se encuentra en algún pedido y no puede eliminarse.\n", input);
-    }
-    free(input);
-}
 /**
  * eliminarLibroInventario
  * Elimina un libro del inventario dado su código
@@ -241,7 +217,7 @@ void eliminarLibroInventario(Inventario** inventario, char* codigo) {
  * Entradas: Inventario* inventario
  * Retorno: ninguno
  */
-void cargaInventarioPorArchivo(Inventario* inventario) {
+void cargaInventarioLotesArchivo(Inventario* inventario) {
     FILE* archivo = fopen("Data/Carga.txt", "r");
     if (!archivo) {
         perror("No se pudo abrir el archivo");
@@ -296,7 +272,7 @@ void cargaInventarioPorArchivo(Inventario* inventario) {
  * Entradas: Inventario** inventario
  * Retorno: ninguno
  */
-void cargarInventarioDesdeArchivo(Inventario** inventario) {
+void cargarInventario(Inventario** inventario) {
     FILE* archivo = fopen("Data/Inventario.txt", "r");
     if (archivo == NULL) {
         perror("Error al abrir el archivo");
