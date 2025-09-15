@@ -1,0 +1,3 @@
+L1, Soledad, Solis
+L2, 1984, Orwell
+L3, La isla de los hombres solos, JK
