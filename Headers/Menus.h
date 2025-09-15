@@ -9,14 +9,15 @@
 
 // ---------------- MENÚ GENERAL ----------------
 static void menuGeneral(Pedido* pedidoActual, Pedido** listaFacturas) {
-   
+    
     int opcion, salir = 0;
     while (!salir) {
-         limpiarPantalla();
-    mostrarencabezado(leer_config());
+        limpiarPantalla();
+        mostrarencabezado(leer_config());
         printf("\n--- Opciones Administrativas ---\n");
         printf("1. Consulta de catálogo\n");
         printf("2. Consulta de cliente\n");
+        printf("3. Consulta de facturas\n");
         printf("0. Volver\n");
         printf("Seleccione una opción: ");
         scanf("%d", &opcion);
@@ -28,6 +29,7 @@ static void menuGeneral(Pedido* pedidoActual, Pedido** listaFacturas) {
         case 2:
             consultarCLiente(*listaFacturas);
             break;
+        case 3: imprimirFacturas(*listaFacturas); break;
         case 0:
             salir = 1;
             break;
@@ -78,7 +80,41 @@ static void menuAdministrativo(Inventario* inventario, Pedido** pedidoActual, Pe
         }
     }
 }
+static void MenuExtras(Pedido* pedidoActual, Pedido** listaFacturas, Inventario* inventario) {
 
+    int opcion, salir = 0;
+    while (!salir) {
+        limpiarPantalla();
+        mostrarencabezado(leer_config());
+        printf("\n--- Opciones Administrativas ---\n");
+        printf("1.Eliminar libro:\n");
+        printf("2. Eliminar cliente\n");
+        printf("3. Eliminar pedido\n");
+        printf("4. Modificar pedido\n");
+        printf("0. Volver\n");
+        printf("Seleccione una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+        case 1:
+
+            break;
+        case 2:
+            
+            break;
+        case 3: 
+                eliminarPedido(listaFacturas, inventario);
+            break;
+        case 4:     
+            break;
+        case 0:
+            salir = 1;
+            break;
+        default:
+			printf("Opción no válida.\n");
+        }
+    }
+}
 static int login(Config* info) {
     char usuario[50], contrasena[50];
     printf("Usuario: ");

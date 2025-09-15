@@ -122,6 +122,7 @@ void liberarFacturas(Pedido* listaFacturas) {
 
 
 
+
 const char* obtenerNombreLibro(Inventario* inv, const char* codigo) {
     while (inv) {
         if (strcmp(inv->libro.codigo, codigo) == 0) return inv->libro.nombre;
@@ -394,6 +395,40 @@ void guardarFactura(Pedido* pedido) {
     fclose(f); // Muy importante cerrar el archivo
 }
 
+void guardarFacturas(Pedido* listaFacturas) {
+    FILE* f = fopen(ARCHIVO_FACTURAS, "w");
+    if (!f) {
+        printf("Error al abrir archivo para guardar facturas.\n");
+        return;
+    }
+
+    Pedido* p = listaFacturas;
+    while (p) {
+        fprintf(f, "{\n");
+        fprintf(f, "  \"cliente\": \"%s\",\n", p->cedulaCliente);
+        fprintf(f, "  \"fecha\": \"%s\",\n", p->fecha);
+        fprintf(f, "  \"id\": %d,\n", p->id);
+        fprintf(f, "  \"lineas\": [\n");
+
+        LineaPedido* lp = p->lineas;
+        while (lp) {
+            fprintf(f, "    {\"codigo\": \"%s\", \"cantidad\": %d, \"precio\": %.2f, \"subtotal\": %.2f}",
+                    lp->codigoLibro, lp->cantidad, lp->precio, lp->cantidad * lp->precio);
+            if (lp->siguiente) fprintf(f, ",\n");
+            else fprintf(f, "\n");
+            lp = lp->siguiente;
+        }
+
+        fprintf(f, "  ],\n");
+        fprintf(f, "  \"subtotal\": %.2f,\n", p->subtotal);
+        fprintf(f, "  \"total\": %.2f\n", p->total);
+        fprintf(f, "}\n\n");
+
+        p = p->siguiente;
+    }
+
+    fclose(f);
+}
 
 // Generar pedido y agregar a la lista de facturas
 void generarPedido(Inventario* inventario, Pedido** pedidoActual, Pedido** listaFacturas, Config** info) {
@@ -582,29 +617,63 @@ void imprimirFacturas(Pedido* listaFacturas) {
     }
 
     Pedido* p = listaFacturas;
-    int numPedido = 1;
+    int count = 0;
 
+    printf("\n--- Lista de Pedidos ---\n");
     while (p) {
-        printf("\n--- Factura %d ---\n", p->id);
-        printf("Cliente: %s\n", p->cedulaCliente);
-        printf("Fecha: %s\n", p->fecha);
-       
-
-        LineaPedido* linea = p->lineas;
-        int numLinea = 1;
-        while (linea) {
-            printf("  %d) Código: %s | Cantidad: %d | Precio: %.2f | Subtotal: %.2f\n",
-                   numLinea, linea->codigoLibro, linea->cantidad, linea->precio, linea->cantidad * linea->precio);
-            linea = linea->siguiente;
-            numLinea++;
-        }
-        printf("\n");
-        printf("Subtotal: %.2f | Total: %.2f\n", p->subtotal, p->total);
-
+        printf("%d) ID: %d | Cliente: %s | Fecha: %s | Subtotal: %.2f | Total: %.2f\n",
+               ++count, p->id, p->cedulaCliente, p->fecha, p->subtotal, p->total);
         p = p->siguiente;
-        numPedido++;
     }
+
+    int opcion;
+    printf("\nSeleccione un pedido para ver detalles (0 para salir): ");
+    if (scanf("%d", &opcion) != 1) {
+        while (getchar() != '\n'); 
+        printf("Entrada inválida.\n");
+        return;
+    }
+
+    if (opcion <= 0 || opcion > count) {
+        printf("Opción no válida.\n");
+        return;
+    }
+
+    // Buscar el pedido seleccionado
+    p = listaFacturas;
+    for (int i = 1; i < opcion; i++) {
+        p = p->siguiente;
+    }
+
+    if (!p) {
+        printf("Pedido no encontrado.\n");
+        return;
+    }
+
+    
+    limpiarPantalla();
+    mostrarencabezado(leer_config());
+    printf("\n--- Detalle del Pedido %d ---#\n", p->id);
+    printf("Cliente: %s\n", p->cedulaCliente);
+    printf("Fecha: %s\n", p->fecha);
+
+    LineaPedido* linea = p->lineas;
+    int numLinea = 1;
+    while (linea) {
+        printf("  %d) Código: %s | Cantidad: %d | Precio: %.2f | Subtotal: %.2f\n",
+               numLinea, linea->codigoLibro, linea->cantidad, linea->precio, linea->cantidad * linea->precio);
+        linea = linea->siguiente;
+        numLinea++;
+    }
+
+    printf("\nSubtotal: %.2f | Total: %.2f\n", p->subtotal, p->total);
+
+    // Esperar ENTER antes de volver
+    printf("\nPresione ENTER para continuar...\n");
+    getchar();
+    getchar();
 }
+
 
 
 int comparar (char *a, char *b) {
@@ -621,6 +690,9 @@ int comparar (char *a, char *b) {
 void consultarCLiente(Pedido* listaFacturas){
     if (!listaFacturas) {
         printf("Ningun cliente ha facturado.\n");
+         printf("Presione Enter para continuar...\n");
+    getchar();
+    getchar();
         return;
     }
     printf("\n");
@@ -651,6 +723,9 @@ void consultarCLiente(Pedido* listaFacturas){
         }
 
     }
+     printf("Presione Enter para continuar...\n");
+    getchar();
+    getchar();
     free(lista); 
 }
 
@@ -699,7 +774,53 @@ void EliminarCliente(Pedido* listaFacturas){
     printf("Cliente eliminado con exito.\n");
     free(lista);
 }
+void eliminarPedido(Pedido** listaFacturas, Inventario* inventario) {
+    if (!*listaFacturas ) {
+        printf("No hay pedidos para eliminar.\n");
+        return;
+    }
+    imprimirFacturas(*listaFacturas);
+    int id;
+    printf("\nIngrese el id del pedido a eliminar(0 para cancelar): ");
+    if (scanf("%d", &id) != 1) {
+        while (getchar() != '\n');  
+        printf("Entrada inválida.\n");
+        if (id == 0) {
+            printf("Operación cancelada.\n");
+            imprimirFacturas(*listaFacturas);
+        }
+        
+        return;
+    }
 
+    Pedido* act = *listaFacturas;
+    Pedido* prev = NULL;
+
+    while (act) {
+        if ((act)->id == id) {
+            Pedido* aEliminar = act;
+            LineaPedido *lp = aEliminar->lineas;
+            while (lp){
+                cambiarCantidad(inventario, lp->codigoLibro, lp->cantidad);
+                lp = lp->siguiente;
+            }
+            if (prev) {
+                prev = (act)->siguiente;
+            } else {
+                *listaFacturas = (act)->siguiente;
+            }
+            guardarFacturas(*listaFacturas);
+            liberarPedido(aEliminar);
+            printf("Pedido con ID %d eliminado.\n", id);
+            return;
+        }
+        prev = act;
+        act = (act)->siguiente;
+    }
+    
+
+    printf("Pedido con ID %d no encontrado.\n", id);
+}
 
 
 #endif // PEDIDO_H
