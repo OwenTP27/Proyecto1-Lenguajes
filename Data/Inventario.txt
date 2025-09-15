@@ -1,6 +1,6 @@
 Titulo: 1984
 Autor: Orwell
 Precio: 15000.00
-Cantidad: 10
+Cantidad: 2
 Codigo: L02
 
