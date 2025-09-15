@@ -102,23 +102,30 @@ static void menuEstadisticas(Pedido* listaFacturas) {
         limpiarPantalla();
         mostrarencabezado(leer_config());
         printf("\n--- Estadísticas ---\n");
-        printf("1. Total de ventas por mes y año\n");
+        printf("1. Total ventas realizadas \n");
         printf("2. Libro más vendido\n");
         printf("3. Cliente con más compras\n"); 
         printf("4. Autor con mas ventas\n");
+        printf("5. Total de ventas por mes y año\n");
         printf("0. Volver\n");
         printf("Seleccione una opción: ");
         scanf("%d", &opcion);
 
         switch (opcion) {
         case 1:
-            totalventasMesAno(listaFacturas);
+            EstadisticaVentas(listaFacturas);
             break;
         case 2:
             
             break;
         case 3:
+            EstadisticaCliente(listaFacturas);
+            break;
+        case 4:
             
+        break;
+        case 5:
+            totalventasMesAno(listaFacturas);
             break;
         case 0:
             salir = 1;

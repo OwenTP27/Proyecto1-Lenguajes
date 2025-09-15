@@ -890,13 +890,13 @@ void EliminarCliente(Pedido* listaFacturas){
 
 
 /*
-  Nombre: EStadisticaCliente
+  Nombre: EstadisticaCliente
   Entradas: Pedido* listaFacturas
   Salida:  Ninguna
   Descripcion: muestra las estaditicas de los clientes ordenandolo por medio del algoridmo burbuja, mostranto en primer 
   lugar el cliente que mas vendio.
 */
-void EStadisticaCliente(Pedido *listaFacturas){
+void EstadisticaCliente(Pedido *listaFacturas){
     if (!listaFacturas) {
         printf("Ningun cliente ha facturado.\n");
          printf("Presione Enter para continuar...\n");
