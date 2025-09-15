@@ -78,22 +78,12 @@ void guardarInventarioEnArchivo(Inventario* inventario) {
     fclose(archivo); 
 }
 
-void cambiarCantidad(Inventario* inventario) {
+void cambiarCantidad(Inventario* inventario, char* codigo, int cantidad) {
     if (inventario == NULL){
         printf("Inventario Vacio\n");
         return;
     }
-
-    int cantidad;
-    char* codigo;
     Inventario* inicio = inventario;//puntero al inicio de inventario
-
-    printf("Ingresa el codigo del Libro: ");
-    codigo = lecturaD();
-
-    printf("Ingresa la cantidad del movimiento: ");
-    scanf("%d", &cantidad);
-    while (getchar() != '\n');//limpiar buffer
 
     while (inventario != NULL) {
         if (strcmp(codigo, inventario->libro.codigo) == 0) {
@@ -106,15 +96,14 @@ void cambiarCantidad(Inventario* inventario) {
                     guardarInventarioEnArchivo(inicio);
                 }
             }
-            free(codigo);
             return;
         }
         inventario = inventario->siguiente;
     }
 
     printf("Libro con código %s no encontrado\n", codigo);
-    free(codigo);
 }
+
 
 void cargaInventarioPorArchivo(Inventario* inventario) {
     FILE* archivo = fopen("Data/Carga.txt", "r");
