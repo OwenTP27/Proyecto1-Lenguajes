@@ -821,6 +821,58 @@ void eliminarPedido(Pedido** listaFacturas, Inventario* inventario) {
 
     printf("Pedido con ID %d no encontrado.\n", id);
 }
+void modificarPedido(Pedido* listaFacturas, Inventario* inventario) {
+    if (!listaFacturas) {
+        printf("No hay pedidos para modificar.\n");
+        return;
+    }
+    imprimirFacturas(listaFacturas);
+    int id;
+    printf("\nIngrese el id del pedido a modificar(0 para cancelar): ");
+    if (scanf("%d", &id) != 1) {
+        while (getchar() != '\n');  
+        printf("Entrada inválida.\n");
+        if (id == 0) {
+            printf("Operación cancelada.\n");
+            imprimirFacturas(listaFacturas);
+        }
+        
+        return;
+    }
 
+    Pedido* act = listaFacturas;
+
+    while (act) {
+        if ((act)->id == id) {
+            int opcion;
+            printf("1. Agregar libro\n2. Eliminar línea\nSeleccione opción: ");
+            scanf("%d", &opcion);
+            switch(opcion){
+                case 1: 
+                limpiarPantalla();
+                mostrarInventario(inventario);
+                agregarLibro(inventario, act); break;
+                case 2: eliminarLibro(act, inventario); break;
+                default: printf("Opción no válida.\n"); break;
+            }
+            float subtotal = 0;
+            LineaPedido* aux = act->lineas;
+
+            while (aux) {
+                subtotal += aux->cantidad * aux->precio;
+                aux = aux->siguiente;
+            }
+            act->subtotal = subtotal;
+            act->total = subtotal * 1.13f;
+            guardarFacturas(listaFacturas);
+            printf("Pedido con ID %d modificado.\n", id);
+            return;
+        }
+        act = (act)->siguiente;
+    }
+    
+
+    printf("Pedido con ID %d no encontrado.\n", id);
+}
 
 #endif // PEDIDO_H
