@@ -154,13 +154,13 @@ static void MenuExtras(Pedido* pedidoActual, Pedido** listaFacturas, Inventario*
             validarEliminacion(*listaFacturas, &inventario);
             break;
         case 2:
-            
+            EliminarCliente(*listaFacturas);
             break;
         case 3: 
-                eliminarPedido(listaFacturas, inventario);
+            eliminarPedido(listaFacturas, inventario);
             break;
         case 4:  
-        modificarPedido(*listaFacturas, inventario);   
+            modificarPedido(*listaFacturas, inventario);   
             break;
             case 5:
             totalventasMesAno(*listaFacturas);
