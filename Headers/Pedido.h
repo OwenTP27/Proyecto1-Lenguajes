@@ -32,10 +32,11 @@ typedef struct Pedido {
     int id;  
     struct Pedido* siguiente;  // Para lista de facturas
 } Pedido;
-  
-void agregarLibro(Inventario* inventario, Pedido* pedidoActual);
+
+
 
 // --------------------- FUNCIONES ---------------------
+/*limpia la terminal para sistemas Windows y Unix   */
 void limpiarPantalla() {
 #ifdef _WIN32
     system("cls");
@@ -43,7 +44,10 @@ void limpiarPantalla() {
     system("clear");
 #endif
 }
-
+/*
+convierte una cadena a minusculas
+recibe un puntero a char (cadena) y no retorna nada
+*/
 void toLowerCase(char* str) {
     for (int i = 0; str[i]; i++) {
         str[i] = tolower((unsigned char)str[i]);
@@ -54,7 +58,7 @@ void mostrarencabezado(Config info) {
     printf("Teléfono: %s | Cédula Jurídica: %s\n", info.libreria.telefono, info.libreria.cedula_juridica);
     printf("Horario: %s\n", info.libreria.horario);
 }
-// Construir línea de pedido
+/* construir línea de pedido */
 LineaPedido* construirLineaPedido(const char* codigoLibro, float precio, int cantidad) {
     LineaPedido* nueva = (LineaPedido*)malloc(sizeof(LineaPedido));
     if (!nueva) { 
@@ -69,7 +73,7 @@ LineaPedido* construirLineaPedido(const char* codigoLibro, float precio, int can
     return nueva;
 }
 
-// Construir pedido
+/* crear el nodo de pedido de la lista enlasada*/
 Pedido* construirPedido(const char* cedulaCliente, const char* fecha) {
     Pedido* p = (Pedido*)malloc(sizeof(Pedido));
     if (!p) { 
@@ -88,18 +92,22 @@ Pedido* construirPedido(const char* cedulaCliente, const char* fecha) {
     p->siguiente = NULL;
     return p;
 }
+/* Elimina espacios en blanco al inicio y al final de una cadena
+recibe un puntero a char (cadena) y no retorna nada
+*/
 void trim(char* str) {
-    // Elimina espacios al inicio
+    
     while(*str == ' ') str++;
 
-    // Elimina espacios y salto de línea al final
     char* end = str + strlen(str) - 1;
     while(end > str && (*end == ' ' || *end == '\n')) {
         *end = '\0';
         end--;
     }
 }
-
+/* Libera la memoria ocupada por un pedido
+recibe un puntero a Pedido y no retorna nada
+*/
 void liberarPedido(Pedido* p) {
     if (!p) return;
     LineaPedido* linea = p->lineas;
@@ -110,7 +118,9 @@ void liberarPedido(Pedido* p) {
     }
     free(p);
 }
-
+/* Libera la memoria ocupada por una lista de facturas
+recibe un puntero a la lista de facturas y no retorna nada
+*/
 void liberarFacturas(Pedido* listaFacturas) {
     Pedido* act = listaFacturas;
     while (act) {
@@ -119,10 +129,9 @@ void liberarFacturas(Pedido* listaFacturas) {
         liberarPedido(tmp);
     }
 }
-
-
-
-
+/* Obtiene el nombre de un libro a partir de su código
+recibe un puntero a Inventario y un puntero a char (código del libro) y retorna un puntero a char (nombre del libro)
+*/
 const char* obtenerNombreLibro(Inventario* inv, const char* codigo) {
     while (inv) {
         if (strcmp(inv->libro.codigo, codigo) == 0) return inv->libro.nombre;
@@ -130,7 +139,9 @@ const char* obtenerNombreLibro(Inventario* inv, const char* codigo) {
     }
     return "Desconocido";
 }
-// Mostrar carrito
+/* Ver líneas de un pedido en pantalla 
+recibe un puntero a Pedido y un puntero a Inventario y no retorna nada
+*/
 void verLineas(Pedido* p, Inventario* inventario) {
     if (!p || !p->lineas) {
         printf("\n---- Carrito vacío ----\n");
@@ -151,17 +162,36 @@ void verLineas(Pedido* p, Inventario* inventario) {
     }
 }
 
-// Obtener fecha actual
-void obtenerFechaActual(char* buffer, int tam) {
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
-    snprintf(buffer, tam, "%02d/%02d/%04d",
-             tm.tm_mday,
-             tm.tm_mon + 1,
-             tm.tm_year + 1900);
+/*
+  Nombre: existe
+  Entradas: char *vcedula puntero a un numero de cedula
+  Salida: 0 si no existe y 1 si existe
+  Descripcion: valida que la fecha tenga el formato dd/mm/aaaa y que sea una fecha valida
+*/
+int validarFecha(const char* fecha) {
+    int d, m, a;
+    
+    
+    if (sscanf(fecha, "%d/%d/%d", &d, &m, &a) != 3) {
+        return 0; // No cumple el formato
+    }
+    if (m < 1 || m > 12) return 0;
+
+    int diasMes[] = {0,31,28,31,30,31,30,31,31,30,31,30,31};
+
+    if (d < 1 || d > diasMes[m]) return 0;
+    if (a < 1900 || a > 2100) return 0;
+    return 1; 
 }
 
+
 // --------------------- GESTIÓN DEL PEDIDO ---------------------
+/*
+  Nombre: mostrarInventarioPorAutor
+  Entradas: Inventario* inv, const char* autor
+  Salida: Ninguna
+  Descripcion: Muestra en pantalla los libros de un autor específico.
+*/
 void mostrarInventarioPorAutor(Inventario* inv, const char* autor) {
     while (inv) {
         const char* autorActual = inv->libro.autor;
@@ -174,6 +204,12 @@ void mostrarInventarioPorAutor(Inventario* inv, const char* autor) {
     }
     printf("\n");
 }
+/*
+  Nombre: mostrarAutores
+  Entradas: Inventario* inv
+  Salida: Ninguna
+  Descripcion: Muestra en pantalla los autores disponibles en el inventario.
+*/
 void mostrarAutores(Inventario* inv) {
     if (!inv) {
         printf("Inventario vacío.\n");
@@ -205,6 +241,13 @@ void mostrarAutores(Inventario* inv) {
         printf("%d. %s\n", i + 1, autores[i]);
     }
 }
+void agregarLibro(Inventario* inventario, Pedido* pedidoActual, int opcion);
+/*
+  Nombre: filtrarLibros
+  Entradas: Inventario* inventario, Pedido* pedidoActual
+  Salida: Ninguna
+  Descripcion: Filtra los libros del inventario por autor y permite agregar al pedido.
+*/
 void filtrarLibros(Inventario* inventario, Pedido* pedidoActual) {
      char autor[100];
     if (!inventario) {
@@ -231,13 +274,19 @@ void filtrarLibros(Inventario* inventario, Pedido* pedidoActual) {
     scanf("%d", &opcion);
     switch (opcion) {
     case 1:
-        agregarLibro(inventario, pedidoActual);
+        agregarLibro(inventario, pedidoActual, 0);
         break;
     default:
         printf("Opción no válida.\n");
         break;
     }
 }
+/*
+  Nombre: codigoValido
+  Entradas: const char* code, int cantidad, float* precio, Inventario* inventario
+  Salida: 0 si no es válido, 1 si es válido
+  Descripcion: Verifica si el código del libro y la cantidad son válidos en el inventario.
+*/
 int codigoValido(const char* code, int cantidad, float* precio, Inventario* inventario) {
     if (cantidad <= 0) {
         printf("Cantidad debe ser mayor que cero.\n");
@@ -257,7 +306,12 @@ int codigoValido(const char* code, int cantidad, float* precio, Inventario* inve
     }
     return 0;
 }
-
+/*
+  Nombre: agregarLineaAlPedido
+  Entradas: Pedido* pedido, const char* codigo, int cantidad, float precio
+  Salida: Ninguna
+  Descripcion: Agrega una línea al pedido. Si la línea ya existe, actualiza la cantidad.
+*/
 void agregarLineaAlPedido(Pedido* pedido, const char* codigo, int cantidad, float precio) {
     if (!pedido) return;
 
@@ -285,8 +339,13 @@ void agregarLineaAlPedido(Pedido* pedido, const char* codigo, int cantidad, floa
     else prev->siguiente = nueva;
     pedido->numLineas++;
 }
-
-void agregarLibro(Inventario* inventario, Pedido* pedidoActual) {
+    /*
+  Nombre: agregarLibro
+  Entradas: Inventario* inventario, Pedido* pedidoActual, int opcion
+  Salida: Ninguna
+  Descripcion: Agrega un libro al pedido actual.
+*/
+void agregarLibro(Inventario* inventario, Pedido* pedidoActual,int opcion) {
     int CantidadL;
     char CodigoL[100];
     float precio;
@@ -306,6 +365,9 @@ void agregarLibro(Inventario* inventario, Pedido* pedidoActual) {
             }
             lp = lp->siguiente;
         }
+        if (opcion == 1) {
+            cantidadTotal = 0; 
+        }
         if (codigoValido(CodigoL, CantidadL+cantidadTotal, &precio, inventario)  == 1) {
             agregarLineaAlPedido(pedidoActual, CodigoL, CantidadL, precio);
             limpiarPantalla();
@@ -322,7 +384,12 @@ void agregarLibro(Inventario* inventario, Pedido* pedidoActual) {
     
 }
 
-
+/*
+  Nombre: eliminarLibro
+  Entradas: Pedido* pedidoActual, Inventario* inventario
+  Salida: Ninguna
+  Descripcion: Elimina un libro del pedido actual.
+*/
 void eliminarLibro(Pedido* pedidoActual, Inventario* inventario) {
     if (!pedidoActual || !pedidoActual->lineas) {
         printf("No hay líneas.\n");
@@ -359,11 +426,16 @@ void eliminarLibro(Pedido* pedidoActual, Inventario* inventario) {
 }
 
 // --------------------- FACTURACIÓN ---------------------
-
+/*
+  Nombre: guardarFactura
+  Entradas: Pedido* pedido
+  Salida: Ninguna
+  Descripcion: Guarda la factura de un pedido en un archivo.
+*/
 void guardarFactura(Pedido* pedido) {
     if (!pedido) { printf("ERROR: pedido es NULL\n"); return; }
     printf("---- FACTURA ----\n");
-    fflush(stdout); // Asegura que se imprima inmediatamente
+    fflush(stdout); 
 
     FILE* f = fopen(ARCHIVO_FACTURAS, "a");
     if (!f) { 
@@ -392,9 +464,14 @@ void guardarFactura(Pedido* pedido) {
     fprintf(f, "  \"total\": %.2f\n", pedido->total);
     fprintf(f, "}\n\n");
 
-    fclose(f); // Muy importante cerrar el archivo
+    fclose(f); 
 }
-
+/*
+  Nombre: guardarFacturas
+  Entradas: Pedido* listaFacturas
+  Salida: Ninguna
+  Descripcion: Guarda todas las facturas en un archivo.
+*/
 void guardarFacturas(Pedido* listaFacturas) {
     FILE* f = fopen(ARCHIVO_FACTURAS, "w");
     if (!f) {
@@ -430,7 +507,12 @@ void guardarFacturas(Pedido* listaFacturas) {
     fclose(f);
 }
 
-// Generar pedido y agregar a la lista de facturas
+/*
+  Nombre: generarPedido
+  Entradas: Inventario* inventario, Pedido** pedidoActual, Pedido** listaFacturas, Config** info
+  Salida: Ninguna
+  Descripcion: Genera un nuevo pedido a partir del inventario y lo agrega a la lista de facturas.
+*/
 void generarPedido(Inventario* inventario, Pedido** pedidoActual, Pedido** listaFacturas, Config** info) {
     limpiarPantalla();
     if (!*pedidoActual) return;
@@ -472,7 +554,7 @@ void generarPedido(Inventario* inventario, Pedido** pedidoActual, Pedido** lista
     guardarFactura(*pedidoActual);
     printf("Factura generada con éxito.\n");
 
-    // Insertar en lista de facturas
+    
     (*pedidoActual)->siguiente = *listaFacturas;
     *listaFacturas = *pedidoActual;
 
@@ -480,7 +562,12 @@ void generarPedido(Inventario* inventario, Pedido** pedidoActual, Pedido** lista
 }
 
 
-// Cargar facturas desde archivo
+/*
+  Nombre: cargarFacturas
+  Entradas: Pedido** listaFacturas
+  Salida: Ninguna
+  Descripcion: Carga las facturas desde un archivo y las agrega a la lista de facturas.
+*/
 void cargarFacturas(Pedido** listaFacturas) {
     FILE* f = fopen(ARCHIVO_FACTURAS, "r");
     if (!f) {
@@ -557,16 +644,22 @@ void cargarFacturas(Pedido** listaFacturas) {
     fclose(f);
 }
 
-   
-
-
-
-// Registrar pedido completo
+/*
+  Nombre: registrarPedido
+  Entradas: Inventario* inventario, Pedido** pedidoActual, Pedido** listaFacturas, Config** info
+  Salida: Ninguna
+  Descripcion: Registra un nuevo pedido en el sistema.
+*/
 void registrarPedido(Inventario* inventario, Pedido** pedidoActual, Pedido** listaFacturas, Config** info) {
     char cedula[MAX_CEDULA];
     char fecha[20];
     limpiarPantalla();
-    obtenerFechaActual(fecha, sizeof(fecha));
+     printf("Ingrese fecha del pedido (dd/mm/aaaa): ");
+    scanf("%19s", fecha);
+    if (!validarFecha(fecha)) {
+        printf("Fecha inválida. Use formato dd/mm/aaaa.\n");
+        return;
+    }
     printf("\n--- Registro de Pedido ---\n");
     mostrarencabezado(**info);
     printf("Ingrese cédula del cliente: ");
@@ -591,7 +684,7 @@ void registrarPedido(Inventario* inventario, Pedido** pedidoActual, Pedido** lis
                 case 1: 
                 limpiarPantalla();
                 mostrarInventario(inventario);
-                agregarLibro(inventario, *pedidoActual); break;
+                agregarLibro(inventario, *pedidoActual,0); break;
                 case 2: eliminarLibro(*pedidoActual, inventario); break;
                 case 3: generarPedido(inventario, pedidoActual, listaFacturas, info ); salir = 1; break;
                 case 4: filtrarLibros(inventario, *pedidoActual); break;
@@ -609,7 +702,12 @@ void registrarPedido(Inventario* inventario, Pedido** pedidoActual, Pedido** lis
         printf("No existe el cliente.\n");
     }
 }
-
+/*
+  Nombre:   imprimirFacturas
+  Entradas: Pedido* listaFacturas
+  Salida:  Ninguna
+  Descripcion: Imprime todas las facturas en la lista de facturas.
+*/
 void imprimirFacturas(Pedido* listaFacturas) {
     if (!listaFacturas) {
         printf("No hay facturas cargadas.\n");
@@ -627,19 +725,19 @@ void imprimirFacturas(Pedido* listaFacturas) {
     }
 
     int opcion;
-    printf("\nSeleccione un pedido para ver detalles (0 para salir): ");
+    printf("\nSeleccione un pedido para ver detalles (0 para continuar4): ");
     if (scanf("%d", &opcion) != 1) {
         while (getchar() != '\n'); 
         printf("Entrada inválida.\n");
         return;
     }
 
-    if (opcion <= 0 || opcion > count) {
+    if ( opcion > count) {
         printf("Opción no válida.\n");
         return;
     }
 
-    // Buscar el pedido seleccionado
+  
     p = listaFacturas;
     for (int i = 1; i < opcion; i++) {
         p = p->siguiente;
@@ -668,14 +766,19 @@ void imprimirFacturas(Pedido* listaFacturas) {
 
     printf("\nSubtotal: %.2f | Total: %.2f\n", p->subtotal, p->total);
 
-    // Esperar ENTER antes de volver
+
     printf("\nPresione ENTER para continuar...\n");
     getchar();
     getchar();
 }
 
 
-
+/*
+  Nombre: comparar
+  Entradas: char *a, char *b
+  Salida:  int
+  Descripcion: Compara dos cadenas de caracteres.
+*/
 int comparar (char *a, char *b) {
     int i = 0;
     while (a[i] != '\0' && b[i] != '\0') {
@@ -686,7 +789,12 @@ int comparar (char *a, char *b) {
     }
     return a[i] == b[i];
 }
-
+/*
+  Nombre: consultarCliente
+  Entradas: Pedido* listaFacturas
+  Salida:  Ninguna
+  Descripcion: Consulta la información de los clientes y sus facturas.
+*/
 void consultarCLiente(Pedido* listaFacturas){
     if (!listaFacturas) {
         printf("Ningun cliente ha facturado.\n");
@@ -728,9 +836,12 @@ void consultarCLiente(Pedido* listaFacturas){
     getchar();
     free(lista); 
 }
-
-
-
+/*
+  Nombre: EliminarCliente
+  Entradas: Pedido* listaFacturas
+  Salida:  Ninguna
+  Descripcion: Elimina un cliente si no ha realizado facturas.
+*/
 void EliminarCliente(Pedido* listaFacturas){
 
     int total = 0;
@@ -774,6 +885,12 @@ void EliminarCliente(Pedido* listaFacturas){
     printf("Cliente eliminado con exito.\n");
     free(lista);
 }
+/*
+  Nombre: eliminarPedido
+  Entradas: Pedido** listaFacturas, Inventario* inventario
+  Salida:  Ninguna
+  Descripcion: Elimina un pedido de la lista de facturas.
+*/    
 void eliminarPedido(Pedido** listaFacturas, Inventario* inventario) {
     if (!*listaFacturas ) {
         printf("No hay pedidos para eliminar.\n");
@@ -821,6 +938,12 @@ void eliminarPedido(Pedido** listaFacturas, Inventario* inventario) {
 
     printf("Pedido con ID %d no encontrado.\n", id);
 }
+/*
+  Nombre: modificarPedido
+  Entradas: Pedido* listaFacturas, Inventario* inventario
+  Salida:  Ninguna
+  Descripcion: Modifica un pedido existente en la lista de facturas.
+*/
 void modificarPedido(Pedido* listaFacturas, Inventario* inventario) {
     if (!listaFacturas) {
         printf("No hay pedidos para modificar.\n");
@@ -832,47 +955,128 @@ void modificarPedido(Pedido* listaFacturas, Inventario* inventario) {
     if (scanf("%d", &id) != 1) {
         while (getchar() != '\n');  
         printf("Entrada inválida.\n");
-        if (id == 0) {
-            printf("Operación cancelada.\n");
-            imprimirFacturas(listaFacturas);
-        }
-        
+        return;
+    }
+    if (id == 0) {
+        printf("Operación cancelada.\n");
         return;
     }
 
     Pedido* act = listaFacturas;
 
     while (act) {
-        if ((act)->id == id) {
+        if (act->id == id) {
             int opcion;
-            printf("1. Agregar libro\n2. Eliminar línea\nSeleccione opción: ");
-            scanf("%d", &opcion);
-            switch(opcion){
-                case 1: 
-                limpiarPantalla();
-                mostrarInventario(inventario);
-                agregarLibro(inventario, act); break;
-                case 2: eliminarLibro(act, inventario); break;
-                default: printf("Opción no válida.\n"); break;
-            }
-            float subtotal = 0;
-            LineaPedido* aux = act->lineas;
+            do {
+                printf("\n--- Modificar Pedido %d ---\n", id);
+                printf("Cliente: %s | Fecha: %s\n", act->cedulaCliente, act->fecha);
+                verLineas(act, inventario);
 
-            while (aux) {
-                subtotal += aux->cantidad * aux->precio;
-                aux = aux->siguiente;
-            }
-            act->subtotal = subtotal;
-            act->total = subtotal * 1.13f;
-            guardarFacturas(listaFacturas);
+                printf("\nOpciones:\n");
+                printf("1. Agregar libro\n");
+                printf("2. Eliminar línea\n");
+                printf("3. Finalizar modificación\n");
+                printf("Seleccione opción: ");
+                scanf("%d", &opcion);
+
+                switch(opcion) {
+                    case 1:
+                        limpiarPantalla();
+                        mostrarencabezado(leer_config());
+                        printf("Fecha del pedido: %s | Cliente: %s\n", act->fecha, act->cedulaCliente);
+                        verLineas(act, inventario);
+                        printf("\n--- Inventario ---\n");
+                        mostrarInventario(inventario);
+                        agregarLibro(inventario, act, 1);
+                        break;
+
+                    case 2:
+                        eliminarLibro(act, inventario);
+                        break;
+
+                    case 3:
+                        printf("Finalizando modificación...\n");
+                        break;
+
+                    default:
+                        printf("Opción no válida.\n");
+                        break;
+                }
+
+                // recalcular totales después de cada cambio
+                float subtotal = 0;
+                LineaPedido* aux = act->lineas;
+                while (aux) {
+                    subtotal += aux->cantidad * aux->precio;
+                    aux = aux->siguiente;
+                }
+                act->subtotal = subtotal;
+                act->total = subtotal * 1.13f;
+                guardarFacturas(listaFacturas);
+
+            } while (opcion != 3);
+
             printf("Pedido con ID %d modificado.\n", id);
             return;
         }
-        act = (act)->siguiente;
+        act = act->siguiente;
     }
-    
 
     printf("Pedido con ID %d no encontrado.\n", id);
 }
+/*
+  Nombre: totalventasMesAno
+  Entradas: Pedido* listaFacturas
+  Salida:  Ninguna
+  Descripcion: Muestra un reporte de ventas totales por mes y año.
+*/
+void totalventasMesAno(Pedido* listaFacturas) {
+    if (!listaFacturas) {
+        printf("No hay facturas cargadas.\n");
+        return;
+    }
+
+    
+    float ventas[3000][13] = {0}; 
+    int anosEncontrados[3000] = {0}; 
+    int minAno = 9999, maxAno = 0;
+
+    Pedido* p = listaFacturas;
+    while (p) {
+        int d, m, a;
+        if (sscanf(p->fecha, "%d/%d/%d", &d, &m, &a) == 3) {
+            if (a >= 1900 && a < 3000 && m >= 1 && m <= 12) {
+                ventas[a][m] += p->total;
+                anosEncontrados[a] = 1;
+                if (a < minAno) minAno = a;
+                if (a > maxAno) maxAno = a;
+            }
+        }
+        p = p->siguiente;
+    }
+
+    if (minAno == 9999) {
+        printf("No se encontraron fechas válidas.\n");
+        return;
+    }
+
+    
+    printf("\n--- Reporte de Ventas por Mes y Año ---\n");
+    for (int a = minAno; a <= maxAno; a++) {
+        if (anosEncontrados[a]) {
+            printf("\nAño %d:\n", a);
+            float totalAnual = 0;
+            for (int m = 1; m <= 12; m++) {
+                if (ventas[a][m] > 0) {
+                    printf("  Mes %02d: %.2f\n", m, ventas[a][m]);
+                    totalAnual += ventas[a][m];
+                }
+            }
+            printf("  Total del año %d: %.2f\n", a, totalAnual);
+        }
+    }
+}
+
+
 
 #endif // PEDIDO_H

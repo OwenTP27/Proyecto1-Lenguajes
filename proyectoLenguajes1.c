@@ -41,10 +41,16 @@ int main()
 			MenuExtras(pedidoActual, &listaFacturas, inventario);
 			break;
 		case 4:
+			printf("Saliendo del programa...\n");
+			liberarFacturas(listaFacturas);
+			liberarInventario(inventario);
+			liberarPedido(pedidoActual);
+		
 			salir = 1;
 			
 			break;
 		default:
+			
 			printf("Opción no válida.\n");
 		}
 	}
