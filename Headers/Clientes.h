@@ -137,6 +137,89 @@ Clientes SolicitarCliente (){
 
     return cliente;
 }
+/*
+  Nombre: LeerClientes
+  Entradas: int *total (salida con la cantidad de clientes)
+  Salida: puntero a un arreglo dinámico de Clientes
+  Descripción: lee el txt y devuelve todos los clientes en memoria dinámica
+*/
+Clientes* LeerClientes(int *total) {
+    FILE *file = fopen(Archivotxt, "r");
+    char linea[200];
+    int count = 0;
+
+    while (fgets(linea, sizeof(linea), file)) {
+        count++;
+    }
+    rewind(file); 
+    Clientes *clientes = malloc(count * sizeof(Clientes));
+    int largo = 0;
+    while (fgets(linea, sizeof(linea), file) && largo < count) {
+        Clientes cliente;
+        int i = 0, j = 0;
+        j = 0;
+        while (linea[i] != ',') {
+            cliente.Cedula[j++] = linea[i++];
+        }
+        cliente.Cedula[j] = '\0';
+        if (linea[i] == ',') i++;
+        j = 0;
+        while (linea[i] != ',') {
+            cliente.Nombre[j++] = linea[i++];
+        }
+        cliente.Nombre[j] = '\0';
+        if (linea[i] == ',') i++;
+        j = 0;
+        while (linea[i] != '\0' && linea[i] != '\n') {
+            cliente.Telefono[j++] = linea[i++];
+        }
+        cliente.Telefono[j] = '\0';
+        clientes[largo++] = cliente;
+    }
+
+    fclose(file);
+    *total = largo; 
+    return clientes;
+}
+
+int compararcedula (char *a, char *b) {
+    int i = 0;
+    while (a[i] != '\0' && b[i] != '\0') {
+        if (a[i] != b[i]) {
+            return 0;
+        }
+        i++;
+    }
+    return a[i] == b[i];
+}
+
+
+void BorrarCliente(char *cedula) {
+    FILE *file = fopen(Archivotxt, "r");
+    char lineas[100][200]; 
+    int totalLineas = 0;
+    int encontrado = 0;
+    char linea[200];
+    while (fgets(linea, sizeof(linea), file) && totalLineas < 100) {
+        char cedulaArchivo[MAX_CEDULA];
+        int i = 0, j = 0;
+        while (linea[i] != ',') {
+            cedulaArchivo[j++] = linea[i++];
+        }
+        cedulaArchivo[j] = '\0';
+        if (compararcedula(cedulaArchivo, cedula)) {
+            continue;
+        }
+        strcpy(lineas[totalLineas++], linea); 
+    }
+    fclose(file);
+    file = fopen(Archivotxt, "w");
+    for (int i = 0; i < totalLineas; i++) {
+        fputs(lineas[i], file);
+    }
+    fclose(file);
+
+}
 
 
 #endif

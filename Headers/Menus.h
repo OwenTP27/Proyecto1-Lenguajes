@@ -26,7 +26,7 @@ static void menuGeneral(Pedido* pedidoActual, Pedido** listaFacturas) {
 
             break;
         case 2:
-
+            consultarCLiente(*listaFacturas);
             break;
         case 0:
             salir = 1;
