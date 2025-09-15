@@ -8,6 +8,8 @@
 #include "Inventario.h"
 #include "Clientes.h"
 #include "LectorJSON.h"
+#include <ctype.h>
+
 
 #define ARCHIVO_FACTURAS "Data/Facturas.txt"
 #define MAX_LINEA 256
@@ -42,7 +44,11 @@ void limpiarPantalla() {
 #endif
 }
 
-
+void toLowerCase(char* str) {
+    for (int i = 0; str[i]; i++) {
+        str[i] = tolower((unsigned char)str[i]);
+    }
+}
 void mostrarencabezado(Config info) {
     printf("---- %s ----\n", info.libreria.nombre);
     printf("Teléfono: %s | Cédula Jurídica: %s\n", info.libreria.telefono, info.libreria.cedula_juridica);
@@ -157,7 +163,9 @@ void obtenerFechaActual(char* buffer, int tam) {
 // --------------------- GESTIÓN DEL PEDIDO ---------------------
 void mostrarInventarioPorAutor(Inventario* inv, const char* autor) {
     while (inv) {
-        if (strcmp(inv->libro.autor, autor) == 0) {
+        const char* autorActual = inv->libro.autor;
+        toLowerCase((char*)autorActual);
+        if (strcmp(autorActual, autor) == 0) {
             printf("%s | %s | %.2f | Stock: %d\n",
                    inv->libro.codigo, inv->libro.nombre, inv->libro.precio, inv->cantidad);
         }
@@ -197,6 +205,7 @@ void mostrarAutores(Inventario* inv) {
     }
 }
 void filtrarLibros(Inventario* inventario, Pedido* pedidoActual) {
+     char autor[100];
     if (!inventario) {
         printf("Inventario vacío.\n");
         return;
@@ -208,10 +217,11 @@ void filtrarLibros(Inventario* inventario, Pedido* pedidoActual) {
     limpiarPantalla();
     mostrarencabezado(leer_config());
     printf("\n--- Filtrar Libros por Autor ---\n");
-    char autor[100];
+   
     mostrarAutores(inventario);
     printf("Ingrese el autor para filtrar: ");
     scanf(" %99[^\n]", autor);
+    toLowerCase(autor);
     limpiarPantalla();
     printf("\n--- Libros del autor: %s ---\n", autor);
     mostrarInventarioPorAutor(inventario, autor);
@@ -228,6 +238,10 @@ void filtrarLibros(Inventario* inventario, Pedido* pedidoActual) {
     }
 }
 int codigoValido(const char* code, int cantidad, float* precio, Inventario* inventario) {
+    if (cantidad <= 0) {
+        printf("Cantidad debe ser mayor que cero.\n");
+        return 0;
+    }   
     while (inventario) {
         if (strcmp(inventario->libro.codigo, code) == 0) {
             if (cantidad <= inventario->cantidad) {
@@ -271,7 +285,6 @@ void agregarLineaAlPedido(Pedido* pedido, const char* codigo, int cantidad, floa
     pedido->numLineas++;
 }
 
-
 void agregarLibro(Inventario* inventario, Pedido* pedidoActual) {
     int CantidadL;
     char CodigoL[100];
@@ -279,18 +292,35 @@ void agregarLibro(Inventario* inventario, Pedido* pedidoActual) {
          
     printf("Ingrese código y cantidad separados por coma (ej: A123,5): ");
     if (scanf(" %99[^,],%d", CodigoL, &CantidadL) == 2) {
-        if (codigoValido(CodigoL, CantidadL, &precio, inventario)  == 1) {
+        if (CantidadL <= 0) {
+            limpiarPantalla();
+            printf("Cantidad debe ser mayor que cero.\n");
+            return;
+        }   
+        int cantidadTotal = 0; 
+        LineaPedido* lp = pedidoActual->lineas;
+        while (lp) {
+            if (strcmp(lp->codigoLibro, CodigoL) == 0) {
+                cantidadTotal += lp->cantidad;
+            }
+            lp = lp->siguiente;
+        }
+        if (codigoValido(CodigoL, CantidadL+cantidadTotal, &precio, inventario)  == 1) {
             agregarLineaAlPedido(pedidoActual, CodigoL, CantidadL, precio);
+            limpiarPantalla();
             printf("Línea agregada al pedido.\n");
         } else {
+            limpiarPantalla();
             printf("Código no existe o stock insuficiente.\n");
         }
     } else {
         int c; while ((c = getchar()) != '\n' && c != EOF);
+        limpiarPantalla();
         printf("Entrada inválida. Use el formato codigo,cantidad (ej: A123,5).\n");
     }
-    limpiarPantalla();
+    
 }
+
 
 void eliminarLibro(Pedido* pedidoActual, Inventario* inventario) {
     if (!pedidoActual || !pedidoActual->lineas) {
@@ -370,12 +400,17 @@ void generarPedido(Inventario* inventario, Pedido** pedidoActual, Pedido** lista
     limpiarPantalla();
     if (!*pedidoActual) return;
 
+    if (!(*pedidoActual)->lineas) {
+            printf("No se pueden procesar compras vacías\n");
+            return;
+        }
+
     float subtotal = 0;
     LineaPedido* aux = (*pedidoActual)->lineas;
 
     while (aux) {
         subtotal += aux->cantidad * aux->precio;
-
+        cambiarCantidad(inventario, aux->codigoLibro, -aux->cantidad);
         Inventario* libro = inventario;
         while (libro) {
             if (strcmp(libro->libro.codigo, aux->codigoLibro) == 0) {
@@ -389,13 +424,16 @@ void generarPedido(Inventario* inventario, Pedido** pedidoActual, Pedido** lista
      int id = (*info)->libreria.siguiente_pedido++;
     (*pedidoActual)->id = id;
     (*pedidoActual)->subtotal = subtotal;
-    (*pedidoActual)->total = subtotal * 1.13f;
+    (*pedidoActual)->total = subtotal * 1.13f;\
+    cambiar(&((*info)->libreria.siguiente_pedido));
     mostrarencabezado(leer_config());
     printf("Fecha: %s | Cliente: %s\n", (*pedidoActual)->fecha, (*pedidoActual)->cedulaCliente);
     verLineas(*pedidoActual, inventario);
     printf("Subtotal: %.2f | Total: %.2f\n", (*pedidoActual)->subtotal, (*pedidoActual)->total);
     printf("Presione Enter para continuar...\n");
     getchar();
+    getchar(); 
+
     guardarFactura(*pedidoActual);
     printf("Factura generada con éxito.\n");
 
@@ -554,7 +592,6 @@ void imprimirFacturas(Pedido* listaFacturas) {
 
         LineaPedido* linea = p->lineas;
         int numLinea = 1;
-        printf("Líneas:\n");
         while (linea) {
             printf("  %d) Código: %s | Cantidad: %d | Precio: %.2f | Subtotal: %.2f\n",
                    numLinea, linea->codigoLibro, linea->cantidad, linea->precio, linea->cantidad * linea->precio);

@@ -76,13 +76,13 @@ static void cambiar(int *nuevo) {
         perror("No se pudo abrir el archivo para leer");
         exit(1);
     }
-
+    //printf("Siguiente pedido actualizado a: %d\n", *nuevo);
     char line[200];
     char buffer[5000] = "";
     while (fgets(line, sizeof(line), f)) {
         if (strstr(line, "\"siguiente_pedido\"")) {
             char nueva_linea[100];
-            sprintf(nueva_linea, "    \"siguiente_pedido\": %d,\n", *nuevo);
+            sprintf(nueva_linea, "    \"siguiente_pedido\": %d\n", *nuevo);
             strcat(buffer, nueva_linea);
         } else {
             strcat(buffer, line);
