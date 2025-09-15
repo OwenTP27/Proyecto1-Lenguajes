@@ -3,7 +3,7 @@
   "fecha": "15/09/2025",
   "id": 3,
   "lineas": [
-    {"codigo": "L02", "cantidad": 5, "precio": 15000.00, "subtotal": 75000.00}
+    {"codigo": "L2", "cantidad": 5, "precio": 15000.00, "subtotal": 75000.00}
   ],
   "subtotal": 75000.00,
   "total": 84750.00
@@ -14,7 +14,7 @@
   "fecha": "15/09/2025",
   "id": 4,
   "lineas": [
-    {"codigo": "L02", "cantidad": 1, "precio": 15000.00, "subtotal": 15000.00}
+    {"codigo": "L2", "cantidad": 1, "precio": 15000.00, "subtotal": 15000.00}
   ],
   "subtotal": 15000.00,
   "total": 16950.00
@@ -25,7 +25,7 @@
   "fecha": "15/09/2025",
   "id": 5,
   "lineas": [
-    {"codigo": "L02", "cantidad": 3, "precio": 15000.00, "subtotal": 45000.00}
+    {"codigo": "L2", "cantidad": 3, "precio": 15000.00, "subtotal": 45000.00}
   ],
   "subtotal": 45000.00,
   "total": 50850.00
