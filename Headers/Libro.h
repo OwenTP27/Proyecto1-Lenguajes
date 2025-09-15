@@ -8,11 +8,22 @@ typedef struct Libro {
 	char *nombre;
 	char *autor;
 	float precio;
-}Libro;
+} Libro;
 
+/**
+ * lecturaD
+ * Función auxiliar para leer una cadena desde la entrada estándar.
+ * Entradas: ninguna.
+ * Retorno: puntero a char con la cadena leída (dinámicamente asignada).
+ */
 char* lecturaD();
 
-
+/**
+ * generarCodigo
+ * Genera un código único para un libro basado en el número de registros en el archivo HistorialLibros.txt.
+ * Entradas: ninguna.
+ * Retorno: puntero a char con el código generado (dinámicamente asignado) o NULL si ocurre un error.
+ */
 char* generarCodigo() {
     FILE* archivo = fopen("Data/HistorialLibros.txt", "r");
     if (!archivo) {
@@ -23,7 +34,7 @@ char* generarCodigo() {
     char linea[256];
     int numFilas = 0;
     while (fgets(linea, sizeof(linea), archivo)) {
-        //Por si llega a haber lineas vacias
+        // Por si llega a haber líneas vacías
         if (strlen(linea) > 1) {
             numFilas++;
         }
@@ -34,13 +45,19 @@ char* generarCodigo() {
     char buffer[20];
     snprintf(buffer, sizeof(buffer), "L%d", numFilas);
 
-    // memoria dinamica del buffer+1
+    // memoria dinámica del buffer+1
     char* codigo = (char*)malloc(strlen(buffer) + 1);
     strcpy(codigo, buffer);
 
     return codigo;
 }
 
+/**
+ * construirLibro
+ * Construye un libro pidiendo al usuario que ingrese nombre, autor y precio.
+ * Entradas: ninguna.
+ * Retorno: estructura Libro con los datos ingresados y código generado automáticamente.
+ */
 Libro construirLibro() {
     char* input;
     Libro nuevoLibro;
@@ -62,6 +79,5 @@ Libro construirLibro() {
 
     return nuevoLibro;
 }
-
 
 #endif // !LIBRO
