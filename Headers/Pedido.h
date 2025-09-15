@@ -184,6 +184,45 @@ int validarFecha(const char* fecha) {
     return 1; 
 }
 
+/**
+ * validarEliminacion
+ * Recorre todos los pedidos y sus líneas buscando un código de libro.
+ * Si no se encuentra en ningún pedido, se llama a eliminarLibroInventario.
+ * Entradas:
+ *   Pedido* pedidos: lista de todos los pedidos
+ *   Inventario** inventario: puntero al inventario
+ */
+void validarEliminacion(Pedido* pedidos, Inventario** inventario) {
+    if (!pedidos) {
+        printf("No hay pedidos registrados.\n");
+        return;
+    }
+
+    printf("Ingrese el código del libro a eliminar: ");
+    char* input = lecturaD();
+
+    int encontrado = 0;
+
+    Pedido* pActual = pedidos;
+    while (pActual != NULL && !encontrado) {
+        LineaPedido* linea = pActual->lineas;
+        while (linea != NULL) {
+            if (strcmp(linea->codigoLibro, input) == 0) {
+                encontrado = 1;
+                break; // libro encontrado en algún pedido
+            }
+            linea = linea->siguiente;
+        }
+        pActual = pActual->siguiente;
+    }
+
+    if (!encontrado) {
+        eliminarLibroInventario(inventario, input);
+    } else {
+        printf("El libro con código %s se encuentra en algún pedido y no puede eliminarse.\n", input);
+    }
+    free(input);
+}
 
 // --------------------- GESTIÓN DEL PEDIDO ---------------------
 /*
