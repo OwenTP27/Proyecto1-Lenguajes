@@ -103,7 +103,8 @@ static void MenuExtras(Pedido* pedidoActual, Pedido** listaFacturas, Inventario*
         case 3: 
                 eliminarPedido(listaFacturas, inventario);
             break;
-        case 4:     
+        case 4:  
+        modificarPedido(*listaFacturas, inventario);   
             break;
         case 0:
             salir = 1;
