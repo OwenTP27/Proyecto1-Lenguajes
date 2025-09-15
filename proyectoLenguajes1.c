@@ -41,6 +41,7 @@ int main()
 			     if (pedidoActual) liberarPedido(pedidoActual);
                 liberarFacturas(listaFacturas);
 				liberar_config(&info);
+				
 			break;
 		default:
 			printf("Opci�n no v�lida.\n");

@@ -94,6 +94,9 @@ static int login(Config* info) {
     else {
         printf("Usuario o contraseña incorrectos.\n");
     }
+    printf("Presione Enter para continuar...\n");
+    getchar();
+    getchar();
     limpiarPantalla();
     return 0;
 }

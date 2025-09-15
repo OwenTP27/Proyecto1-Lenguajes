@@ -116,7 +116,7 @@ void cambiarCantidad(Inventario* inventario, char* codigo, int cantidad) {
     printf("Libro con código %s no encontrado\n", codigo);
 }
 
-void eliminarLibro(Inventario** inventario, char* codigo) {
+void eliminarLibroIventario(Inventario** inventario, char* codigo) {
     if (*inventario == NULL) {
         printf("Inventario vacío\n");
         return;
