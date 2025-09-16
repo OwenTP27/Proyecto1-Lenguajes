@@ -242,6 +242,10 @@ void mostrarAutores(Inventario* inv) {
     }
 }
 void agregarLibro(Inventario* inventario, Pedido* pedidoActual, int opcion);
+void limpiarBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
 /*
   Nombre: filtrarLibros
   Entradas: Inventario* inventario, Pedido* pedidoActual
@@ -263,6 +267,8 @@ void filtrarLibros(Inventario* inventario, Pedido* pedidoActual) {
     printf("\n--- Filtrar Libros por Autor ---\n");
    
     mostrarAutores(inventario);
+    limpiarBuffer();
+
     printf("Ingrese el autor para filtrar: ");
     scanf(" %99[^\n]", autor);
     toLowerCase(autor);
@@ -281,6 +287,7 @@ void filtrarLibros(Inventario* inventario, Pedido* pedidoActual) {
         break;
     }
 }
+
 /*
   Nombre: codigoValido
   Entradas: const char* code, int cantidad, float* precio, Inventario* inventario
