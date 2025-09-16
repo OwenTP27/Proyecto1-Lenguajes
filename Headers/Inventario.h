@@ -169,6 +169,9 @@ void mostrarInventario(Inventario* inventario) {
     }
 
     printf("-------------------------------------------------------------------------------------\n");
+    printf("presione Enter para continuar...");
+    getchar();
+    getchar();
 }
 
 /**

@@ -59,7 +59,7 @@ static void menuEstadisticas(Pedido* listaFacturas) {
   Salida:  Ninguna
   Descripcion: Muestra el menú general de la aplicación.
 */
-static void menuGeneral(Pedido* pedidoActual, Pedido** listaFacturas) {
+static void menuGeneral(Pedido* pedidoActual, Pedido** listaFacturas, Inventario* inventario) {
     
     int opcion, salir = 0;
     while (!salir) {
@@ -69,13 +69,14 @@ static void menuGeneral(Pedido* pedidoActual, Pedido** listaFacturas) {
         printf("1. Consulta de catálogo\n");
         printf("2. Consulta de cliente\n");
         printf("3. Consulta de facturas\n");
+       
         printf("0. Volver\n");
         printf("Seleccione una opción: ");
         scanf("%d", &opcion);
 
         switch (opcion) {
         case 1:
-            
+            mostrarInventario(inventario);
             break;
         case 2:
             consultarCLiente(*listaFacturas);
@@ -86,52 +87,6 @@ static void menuGeneral(Pedido* pedidoActual, Pedido** listaFacturas) {
             break;
         default:
 			printf("Opción no válida.\n");
-        }
-    }
-}
-
-// ---------------- MENÚ ADMINISTRATIVO ----------------
-/*
-  Nombre: menuAdministrativo
-  Entradas: Inventario* inventario, Pedido** pedidoActual, Pedido** listaFacturas, Config* info
-  Salida:  Ninguna
-  Descripcion: Muestra el menú administrativo de la aplicación.
-*/
-static void menuAdministrativo(Inventario* inventario, Pedido** pedidoActual, Pedido** listaFacturas, Config* info) {
-    
-    int opcion, salir = 0;
-    while (!salir) {
-         limpiarPantalla();
-    mostrarencabezado(leer_config());
-        printf("\n--- Menú Administrativo ---\n");
-        printf("1. Registrar libros\n");
-        printf("2. Manejo de inventario\n");
-        printf("3. Registrar clientes\n");
-        printf("4. Crear pedido\n");
-        printf("5. Estadísticas\n");
-        printf("0. Volver\n");
-        printf("Seleccione una opción: ");
-        scanf("%d", &opcion);
-
-        switch (opcion) {
-        case 1:
-            agregarAlInventario(&inventario);
-            break;
-        case 3: {
-            Clientes c = SolicitarCliente();
-                printf("Cliente %s registrado correctamente.\n", c.Nombre);
-            } break;
-        case 4:
-            registrarPedido(inventario, pedidoActual, listaFacturas, &info);
-            break;
-        case 5:
-            menuEstadisticas(*listaFacturas);
-            break;
-        case 0:
-            salir = 1;
-            break;          
-        default:
-            printf("Opción no válida.\n");
         }
     }
 }
@@ -181,6 +136,59 @@ static void MenuExtras(Pedido* pedidoActual, Pedido** listaFacturas, Inventario*
         }
     }
 }
+// ---------------- MENÚ ADMINISTRATIVO ----------------
+/*
+  Nombre: menuAdministrativo
+  Entradas: Inventario* inventario, Pedido** pedidoActual, Pedido** listaFacturas, Config* info
+  Salida:  Ninguna
+  Descripcion: Muestra el menú administrativo de la aplicación.
+*/
+static void menuAdministrativo(Inventario* inventario, Pedido** pedidoActual, Pedido** listaFacturas, Config* info) {
+    
+    int opcion, salir = 0;
+    while (!salir) {
+         limpiarPantalla();
+    mostrarencabezado(leer_config());
+        printf("\n--- Menú Administrativo ---\n");
+        printf("1. Registrar libros\n");
+        printf("2. Manejo de inventario\n");
+        printf("3. Registrar clientes\n");
+        printf("4. Crear pedido\n");
+        printf("5. Estadísticas\n");
+        printf("6. Opciones Extras\n");
+        printf("0. Volver\n");
+        printf("Seleccione una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+        case 1:
+            agregarAlInventario(&inventario);
+            break;
+        case 3: {
+            Clientes c = SolicitarCliente();
+                printf("Cliente %s registrado correctamente.\n", c.Nombre);
+            } break;
+        case 4:
+            registrarPedido(inventario, pedidoActual, listaFacturas, &info);
+            break;
+        case 5:
+            menuEstadisticas(*listaFacturas);
+            break;
+        case 6:
+            MenuExtras(*pedidoActual, listaFacturas, inventario);
+            break;
+        case 7: 
+            cargaInventarioLotesArchivo(inventario);
+            break;
+        case 0:
+            salir = 1;
+            break;          
+        default:
+            printf("Opción no válida.\n");
+        }
+    }
+}
+
 /*
   Nombre: login
   Entradas: Config* info

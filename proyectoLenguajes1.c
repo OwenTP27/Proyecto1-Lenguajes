@@ -10,7 +10,7 @@ int main()
 	Inventario* inventario = NULL;
 	Pedido* pedidoActual = NULL;
 	Pedido* listaFacturas = NULL;
-	cargarInventarioDesdeArchivo(&inventario);
+	cargarInventario(&inventario);
 	cargarFacturas(&listaFacturas);
 	Config info = leer_config();
 	//imprimirFacturas(listaFacturas);
@@ -26,9 +26,7 @@ int main()
 
 		switch (opcion) {
 		case 1:
-		
-			menuGeneral(pedidoActual, &listaFacturas);
-
+			menuGeneral(pedidoActual, &listaFacturas, inventario);
 			break;
 		case 2:
 			if (login(&info)) {
