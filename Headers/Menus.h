@@ -6,6 +6,7 @@
 #include "Pedido.h"
 #include "Inventario.h"
 #include "Clientes.h"
+#include "Ventas.h"
 /*
   Nombre: menuEstadisticas
   Entradas: Pedido* listaFacturas
@@ -32,14 +33,14 @@ static void menuEstadisticas(Pedido* listaFacturas) {
             EstadisticaVentas(listaFacturas);
             break;
         case 2:
-            
+            top5LibrosMasVendidos(listaFacturas);
             break;
         case 3:
             EstadisticaCliente(listaFacturas);
             break;
         case 4:
-            
-        break;
+            top5AutoresMasVendidos(listaFacturas);
+            break;
         case 5:
             totalventasMesAno(listaFacturas);
             break;
@@ -74,7 +75,7 @@ static void menuGeneral(Pedido* pedidoActual, Pedido** listaFacturas) {
 
         switch (opcion) {
         case 1:
-
+            
             break;
         case 2:
             consultarCLiente(*listaFacturas);
