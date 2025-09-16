@@ -1,4 +1,3 @@
-L1,Soledad,Solis,10000.00,20
-L2,1984,Orwell,15000.00,40
-L3,La isla de los hombres solos,JK,20000.00,35
-
+L1,Soledad,solis,10000.00,14
+L2,1984,orwell,15000.00,40
+L3,La isla de los hombres solos,jk,20000.00,35

@@ -349,8 +349,11 @@ void agregarLibro(Inventario* inventario, Pedido* pedidoActual,int opcion) {
     int CantidadL;
     char CodigoL[100];
     float precio;
-         
+
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
     printf("Ingrese código y cantidad separados por coma (ej: A123,5): ");
+    
     if (scanf(" %99[^,],%d", CodigoL, &CantidadL) == 2) {
         if (CantidadL <= 0) {
             limpiarPantalla();
@@ -368,14 +371,18 @@ void agregarLibro(Inventario* inventario, Pedido* pedidoActual,int opcion) {
         if (opcion == 1) {
             cantidadTotal = 0; 
         }
+ 
         if (codigoValido(CodigoL, CantidadL+cantidadTotal, &precio, inventario)  == 1) {
             agregarLineaAlPedido(pedidoActual, CodigoL, CantidadL, precio);
             limpiarPantalla();
+            
             printf("Línea agregada al pedido.\n");
         } else {
             limpiarPantalla();
             printf("Código no existe o stock insuficiente.\n");
         }
+        printf("codigo %s\n", CodigoL);
+        printf("cantidad %d\n", CantidadL);
     } else {
         int c; while ((c = getchar()) != '\n' && c != EOF);
         limpiarPantalla();
@@ -884,6 +891,9 @@ void EliminarCliente(Pedido* listaFacturas){
     BorrarCliente(lista[opcion-1].Cedula);
     printf("Cliente eliminado con exito.\n");
     free(lista);
+    printf("Presione Enter para continuar...\n");
+    getchar();
+    getchar();
 }
 
 
@@ -977,22 +987,22 @@ void EstadisticaVentas(Pedido *listaFacturas) {
         montoTotal += factura->total;
         int año;
         sscanf(factura->fecha, "%*d/%*d/%d", &año);
-        int existe = 0 ;
+        int indice = -1;
         for (int i = 0; i < usados; i++) {
             if (Años[i] == año) { 
-                existe = 1; 
+                indice = i; 
                 break; 
             }
         }
-        if (existe == 0) {
+        if (indice == -1) {
             Años[usados] = año;
             ventaaño[usados] = factura->total;
             pedidoaño[usados] = 1;
             usados++;
         } 
         else {
-            ventaaño[existe] += factura->total;
-            pedidoaño[existe]++;
+            ventaaño[indice] += factura->total;
+            pedidoaño[indice]++;
         }
         factura = factura->siguiente;
     }
@@ -1205,7 +1215,6 @@ void totalventasMesAno(Pedido* listaFacturas) {
     getchar();
 }
 
-
 /**
  * validarEliminacion
  * Recorre todos los pedidos y sus líneas buscando un código de libro.
@@ -1216,12 +1225,22 @@ void totalventasMesAno(Pedido* listaFacturas) {
  */
 void validarEliminacion(Pedido* pedidos, Inventario** inventario) {
     if (!pedidos) {
-        printf("No hay pedidos registrados.\n");
+        printf("No hay pedidos registrados.\n\n");
         return;
     }
 
+
+    mostrarInventario(*inventario);
+
     printf("Ingrese el código del libro a eliminar: ");
-    char* input = lecturaD();
+    char buffer[256];
+    if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
+        printf("Error al leer el código.\n");
+        return;
+    }
+
+    buffer[strcspn(buffer, "\n")] = 0;
+    char* input = strdup(buffer);
 
     int encontrado = 0;
 
@@ -1231,7 +1250,7 @@ void validarEliminacion(Pedido* pedidos, Inventario** inventario) {
         while (linea != NULL) {
             if (strcmp(linea->codigoLibro, input) == 0) {
                 encontrado = 1;
-                break; // libro encontrado en algún pedido
+                break;
             }
             linea = linea->siguiente;
         }
@@ -1243,10 +1262,10 @@ void validarEliminacion(Pedido* pedidos, Inventario** inventario) {
     } else {
         printf("El libro con código %s se encuentra en algún pedido y no puede eliminarse.\n", input);
     }
-    free(input);
+
+
     printf("\nPresione Enter para continuar...\n");
-    getchar();
-    getchar();
+    while (getchar() != '\n'); // espera un solo Enter
 }
 
 

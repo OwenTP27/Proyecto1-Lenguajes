@@ -101,6 +101,9 @@ void top5LibrosMasVendidos(Pedido* listaPedidos) {
                libros[i].codigo, libros[i].nombre, libros[i].autor,
                libros[i].cantidadVendida, libros[i].subtotal);
     }
+    printf("presione Enter para continuar...");
+    getchar();
+    getchar();
 }
 
 
@@ -199,6 +202,9 @@ void top5AutoresMasVendidos(Pedido* listaPedidos) {
                listaAutores[i].cantidadVendida,
                listaAutores[i].subtotal);
     }
+    printf("presione Enter para continuar...");
+    getchar();
+    getchar();
 }
 
 

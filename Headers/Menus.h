@@ -151,11 +151,10 @@ static void menuAdministrativo(Inventario* inventario, Pedido** pedidoActual, Pe
     mostrarencabezado(leer_config());
         printf("\n--- Menú Administrativo ---\n");
         printf("1. Registrar libros\n");
-        printf("2. Manejo de inventario\n");
-        printf("3. Registrar clientes\n");
-        printf("4. Crear pedido\n");
-        printf("5. Estadísticas\n");
-        printf("6. Opciones Extras\n");
+        printf("2. Registrar clientes\n");
+        printf("3. Crear pedido\n");
+        printf("4. Estadísticas\n");
+        printf("5. Opciones Extras\n");
         printf("0. Volver\n");
         printf("Seleccione una opción: ");
         scanf("%d", &opcion);
@@ -164,20 +163,20 @@ static void menuAdministrativo(Inventario* inventario, Pedido** pedidoActual, Pe
         case 1:
             agregarAlInventario(&inventario);
             break;
-        case 3: {
+        case 2: {
             Clientes c = SolicitarCliente();
                 printf("Cliente %s registrado correctamente.\n", c.Nombre);
             } break;
-        case 4:
+        case 3:
             registrarPedido(inventario, pedidoActual, listaFacturas, &info);
             break;
-        case 5:
+        case 4:
             menuEstadisticas(*listaFacturas);
             break;
-        case 6:
+        case 5  :
             MenuExtras(*pedidoActual, listaFacturas, inventario);
             break;
-        case 7: 
+        case 6: 
             cargaInventarioLotesArchivo(inventario);
             break;
         case 0:

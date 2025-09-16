@@ -25,6 +25,7 @@ char* lecturaD();
  * Retorno: puntero a char con el código generado (dinámicamente asignado) o NULL si ocurre un error.
  */
 char* generarCodigo() {
+
     FILE* archivo = fopen("Data/HistorialLibros.txt", "r");
     if (!archivo) {
         printf("No se pudo abrir el archivo\n");
@@ -59,10 +60,13 @@ char* generarCodigo() {
  * Retorno: estructura Libro con los datos ingresados y código generado automáticamente.
  */
 Libro construirLibro() {
+
     char* input;
     Libro nuevoLibro;
     nuevoLibro.codigo = generarCodigo();
-
+    // Limpiar buffer por si hay restos de scanf anteriores
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
     printf("Ingresa el nombre del Libro: ");
     input = lecturaD();
     nuevoLibro.nombre = strdup(input);
