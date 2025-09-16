@@ -20,6 +20,13 @@ typedef struct {
     char Telefono[MAX_TELEFONO];
 } Clientes;
 
+
+typedef struct {
+    Clientes cliente;
+    int TotalFacturas;
+    float total;
+} Registro;
+
 /*
   Nombre: existe
   Entradas: char *vcedula puntero a un numero de cedula

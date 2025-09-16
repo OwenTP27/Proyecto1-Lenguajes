@@ -6,7 +6,52 @@
 #include "Pedido.h"
 #include "Inventario.h"
 #include "Clientes.h"
+#include "Ventas.h"
+/*
+  Nombre: menuEstadisticas
+  Entradas: Pedido* listaFacturas
+  Salida:  Ninguna
+  Descripcion: Muestra el menú de estadísticas de la aplicación.
+*/
+static void menuEstadisticas(Pedido* listaFacturas) {
+    int opcion, salir = 0;
+    while (!salir) {
+        limpiarPantalla();
+        mostrarencabezado(leer_config());
+        printf("\n--- Estadísticas ---\n");
+        printf("1. Total ventas realizadas \n");
+        printf("2. Libro más vendido\n");
+        printf("3. Cliente con más compras\n"); 
+        printf("4. Autor con mas ventas\n");
+        printf("5. Total de ventas por mes y año\n");
+        printf("0. Volver\n");
+        printf("Seleccione una opción: ");
+        scanf("%d", &opcion);
 
+        switch (opcion) {
+        case 1:
+            EstadisticaVentas(listaFacturas);
+            break;
+        case 2:
+            top5LibrosMasVendidos(listaFacturas);
+            break;
+        case 3:
+            EstadisticaCliente(listaFacturas);
+            break;
+        case 4:
+            top5AutoresMasVendidos(listaFacturas);
+            break;
+        case 5:
+            totalventasMesAno(listaFacturas);
+            break;
+        case 0:
+            salir = 1;
+            break;
+        default:
+            printf("Opción no válida.\n");
+        }
+    }
+}
 // ---------------- MENÚ GENERAL ----------------
 /*
   Nombre: menuGeneral
@@ -30,7 +75,7 @@ static void menuGeneral(Pedido* pedidoActual, Pedido** listaFacturas) {
 
         switch (opcion) {
         case 1:
-
+            
             break;
         case 2:
             consultarCLiente(*listaFacturas);
@@ -90,44 +135,7 @@ static void menuAdministrativo(Inventario* inventario, Pedido** pedidoActual, Pe
         }
     }
 }
-/*
-  Nombre: menuEstadisticas
-  Entradas: Pedido* listaFacturas
-  Salida:  Ninguna
-  Descripcion: Muestra el menú de estadísticas de la aplicación.
-*/
-static void menuEstadisticas(Pedido* listaFacturas) {
-    int opcion, salir = 0;
-    while (!salir) {
-        limpiarPantalla();
-        mostrarencabezado(leer_config());
-        printf("\n--- Estadísticas ---\n");
-        printf("1. Total de ventas por mes y año\n");
-        printf("2. Libro más vendido\n");
-        printf("3. Cliente con más compras\n"); 
-        printf("4. Autor con mas ventas\n");
-        printf("0. Volver\n");
-        printf("Seleccione una opción: ");
-        scanf("%d", &opcion);
 
-        switch (opcion) {
-        case 1:
-            totalventasMesAno(listaFacturas);
-            break;
-        case 2:
-            
-            break;
-        case 3:
-            
-            break;
-        case 0:
-            salir = 1;
-            break;
-        default:
-            printf("Opción no válida.\n");
-        }
-    }
-}
 /*
   Nombre: MenuExtras
   Entradas: Pedido* pedidoActual, Pedido** listaFacturas, Inventario* inventario
@@ -154,13 +162,13 @@ static void MenuExtras(Pedido* pedidoActual, Pedido** listaFacturas, Inventario*
             validarEliminacion(*listaFacturas, &inventario);
             break;
         case 2:
-            
+            EliminarCliente(*listaFacturas);
             break;
         case 3: 
-                eliminarPedido(listaFacturas, inventario);
+            eliminarPedido(listaFacturas, inventario);
             break;
         case 4:  
-        modificarPedido(*listaFacturas, inventario);   
+            modificarPedido(*listaFacturas, inventario);   
             break;
             case 5:
             totalventasMesAno(*listaFacturas);

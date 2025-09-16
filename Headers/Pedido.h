@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "Inventario.h"
 #include "Clientes.h"
 #include "LectorJSON.h"
+#include "Inventario.h"
 #include <ctype.h>
 
 
@@ -885,6 +885,131 @@ void EliminarCliente(Pedido* listaFacturas){
     printf("Cliente eliminado con exito.\n");
     free(lista);
 }
+
+
+
+
+/*
+  Nombre: EstadisticaCliente
+  Entradas: Pedido* listaFacturas
+  Salida:  Ninguna
+  Descripcion: muestra las estaditicas de los clientes ordenandolo por medio del algoridmo burbuja, mostranto en primer 
+  lugar el cliente que mas vendio.
+*/
+void EstadisticaCliente(Pedido *listaFacturas){
+    if (!listaFacturas) {
+        printf("Ningun cliente ha facturado.\n");
+         printf("Presione Enter para continuar...\n");
+    getchar();
+    getchar();
+        return;
+    }
+    printf("\n");
+    printf("\n--- Estadísticas de Clientes ---\n");
+    int total = 0;
+    Clientes *lista = LeerClientes(&total);
+    Registro registros[5];
+    for (int i = 0; i < total; i++) {
+        registros[i].cliente = lista[i];
+        int vacio = 0;
+        int totalFacturas = 0;
+        float totalGastado = 0.0000f;
+        Pedido* factura = listaFacturas;
+        while (factura) {
+            if (comparar(factura->cedulaCliente, lista[i].Cedula)) {
+                vacio = 1;
+                totalFacturas++;
+                totalGastado += factura->total;
+            }
+            factura = factura->siguiente;   
+        }
+        registros[i].TotalFacturas = totalFacturas;
+        registros[i].total = totalGastado;  
+    }
+
+
+    // algoritmo burbuja)
+    for (int i = 0; i < total -1 ; i++) {
+        for (int j = 0; j < total - i - 1; j++) {
+            if (registros[j].total < registros[j + 1].total) {
+                Registro temp = registros[j];
+                registros[j] = registros[j + 1];
+                registros[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("\n--- CLientes con mas pedidos \n");
+    for (int i = 0; i < total; i++) {
+        printf(" %d) - Cedula : %s | CLiente : %s | total facturas: %d | total: %.2f | \n", 
+        i+1, registros[i].cliente.Cedula, registros[i].cliente.Nombre, registros[i].TotalFacturas, registros[i].total);
+    }
+    printf("Presione Enter para continuar...\n");
+    getchar();
+    getchar();
+    free(lista);
+}
+
+/*
+  Nombre: EstadisticaVentas
+  Entradas: Pedido* listaFacturas
+  Salida:  Ninguna
+  Descripcion: Elimina un cliente si no ha realizado facturas.
+*/
+void EstadisticaVentas(Pedido *listaFacturas) {
+    if (!listaFacturas) {
+        printf("No hay pedidos registrados.\n");
+        printf("Presione Enter para continuar...\n");
+        getchar();
+        getchar();
+        return;
+    }
+    int totalPedidos = 0;
+    float montoTotal = 0.0f;
+    int Años[100];
+    float ventaaño[100];
+    int pedidoaño[100];
+    int usados = 0;
+
+    Pedido *factura = listaFacturas;
+    while (factura) {
+        totalPedidos++;
+        montoTotal += factura->total;
+        int año;
+        sscanf(factura->fecha, "%*d/%*d/%d", &año);
+        int existe = 0 ;
+        for (int i = 0; i < usados; i++) {
+            if (Años[i] == año) { 
+                existe = 1; 
+                break; 
+            }
+        }
+        if (existe == 0) {
+            Años[usados] = año;
+            ventaaño[usados] = factura->total;
+            pedidoaño[usados] = 1;
+            usados++;
+        } 
+        else {
+            ventaaño[existe] += factura->total;
+            pedidoaño[existe]++;
+        }
+        factura = factura->siguiente;
+    }
+
+    printf("\n--- Estadísticas de Ventas Globales ---\n");
+    printf("\nVentas por año:\n");
+    for (int i = 0; i < usados; i++) {
+        printf("Año %d -> Pedidos: %d | Monto: %.2f\n", Años[i], pedidoaño[i], ventaaño[i]);
+    }
+    printf("----------------------------------------------------------\n");
+    printf("Total de pedidos realizados: %d\n", totalPedidos);
+    printf("Monto total vendido: %.2f\n", montoTotal);
+    printf("\nPresione Enter para continuar...\n");
+    getchar();
+    getchar();
+}
+
 /*
   Nombre: eliminarPedido
   Entradas: Pedido** listaFacturas, Inventario* inventario
@@ -1075,8 +1200,54 @@ void totalventasMesAno(Pedido* listaFacturas) {
             printf("  Total del año %d: %.2f\n", a, totalAnual);
         }
     }
+    printf("\nPresione Enter para continuar...\n");
+    getchar();
+    getchar();
 }
 
+
+/**
+ * validarEliminacion
+ * Recorre todos los pedidos y sus líneas buscando un código de libro.
+ * Si no se encuentra en ningún pedido, se llama a eliminarLibroInventario.
+ * Entradas:
+ *   Pedido* pedidos: lista de todos los pedidos
+ *   Inventario** inventario: puntero al inventario
+ */
+void validarEliminacion(Pedido* pedidos, Inventario** inventario) {
+    if (!pedidos) {
+        printf("No hay pedidos registrados.\n");
+        return;
+    }
+
+    printf("Ingrese el código del libro a eliminar: ");
+    char* input = lecturaD();
+
+    int encontrado = 0;
+
+    Pedido* pActual = pedidos;
+    while (pActual != NULL && !encontrado) {
+        LineaPedido* linea = pActual->lineas;
+        while (linea != NULL) {
+            if (strcmp(linea->codigoLibro, input) == 0) {
+                encontrado = 1;
+                break; // libro encontrado en algún pedido
+            }
+            linea = linea->siguiente;
+        }
+        pActual = pActual->siguiente;
+    }
+
+    if (!encontrado) {
+        eliminarLibroInventario(inventario, input);
+    } else {
+        printf("El libro con código %s se encuentra en algún pedido y no puede eliminarse.\n", input);
+    }
+    free(input);
+    printf("\nPresione Enter para continuar...\n");
+    getchar();
+    getchar();
+}
 
 
 #endif // PEDIDO_H
