@@ -665,6 +665,9 @@ void registrarPedido(Inventario* inventario, Pedido** pedidoActual, Pedido** lis
     scanf("%19s", fecha);
     if (!validarFecha(fecha)) {
         printf("Fecha inválida. Use formato dd/mm/aaaa.\n");
+        printf("Presione Enter para continuar...\n");
+        getchar();
+        getchar();
         return;
     }
     printf("\n--- Registro de Pedido ---\n");
@@ -707,7 +710,12 @@ void registrarPedido(Inventario* inventario, Pedido** pedidoActual, Pedido** lis
         }
     } else {
         printf("No existe el cliente.\n");
+        printf("Presione Enter para continuar...\n");
+        getchar();
+        getchar();
+
     }
+
 }
 /*
   Nombre:   imprimirFacturas

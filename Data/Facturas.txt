@@ -1,7 +1,7 @@
 {
   "cliente": "703080520",
   "fecha": "23/05/2004",
-  "id": 8,
+  "id": 1,
   "lineas": [
     {"codigo": "L1", "cantidad": 2, "precio": 10000.00, "subtotal": 20000.00},
     {"codigo": "L3", "cantidad": 5, "precio": 20000.00, "subtotal": 100000.00}
@@ -13,7 +13,7 @@
 {
   "cliente": "703080520",
   "fecha": "02/02/2004",
-  "id": 7,
+  "id": 2,
   "lineas": [
     {"codigo": "L2", "cantidad": 3, "precio": 15000.00, "subtotal": 45000.00}
   ],
@@ -24,7 +24,7 @@
 {
   "cliente": "703080520",
   "fecha": "15/09/2025",
-  "id": 6,
+  "id": 3,
   "lineas": [
     {"codigo": "L02", "cantidad": 10, "precio": 15000.00, "subtotal": 150000.00}
   ],
@@ -33,12 +33,13 @@
 }
 
 {
-  "cliente": "703080520",
-  "fecha": "15/09/2025",
+  "cliente": "119200156",
+  "fecha": "8/11/2004",
   "id": 4,
   "lineas": [
+    {"codigo": "L4", "cantidad": 4, "precio": 8000.00, "subtotal": 32000.00}
   ],
-  "subtotal": 270000.00,
-  "total": 305100.00
+  "subtotal": 32000.00,
+  "total": 36160.00
 }
 

@@ -81,6 +81,13 @@ Libro construirLibro() {
     scanf("%f", &nuevoLibro.precio);
     while (getchar() != '\n');  // limpiar buffer
 
+    printf("\nEl libro se regitro con exito.\n");
+    printf("Presione Enter para continuar...\n");
+    getchar();
+    getchar();
+
+    
+
     return nuevoLibro;
 }
 

@@ -142,6 +142,10 @@ Clientes SolicitarCliente (){
         }
     }
 
+    printf("Presione Enter para continuar...\n");
+    getchar();
+    getchar();
+
     return cliente;
 }
 /*

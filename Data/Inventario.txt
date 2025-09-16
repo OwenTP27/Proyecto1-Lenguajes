@@ -1,3 +1,4 @@
 L1,Soledad,solis,10000.00,14
 L2,1984,orwell,15000.00,40
-L3,La isla de los hombres solos,jk,20000.00,35
+L3,La isla,jk,20000.00,35
+L4,harry Potter ,j. k. roeling,8000.00,6
