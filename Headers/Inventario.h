@@ -1,7 +1,6 @@
 #include "Libro.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "Pedido.h"
 #ifndef INVENTARIO
 #define INVENTARIO
 
@@ -10,7 +9,6 @@ typedef struct Inventario {
 	int cantidad;
 	struct Inventario *siguiente;
 } Inventario;
-
 /**
  * liberarInventario
  * Funcion para liberar la memoria usada en la lista enlazada
@@ -25,8 +23,6 @@ void liberarInventario(Inventario* inventario) {
         actual = siguiente; // pasar al siguiente
     }
 }
-
-
 /**
  * guardarEnHistorial
  * Guarda la información básica del libro (codigo, nombre, autor) en el archivo HistorialLibros.txt
@@ -40,7 +36,7 @@ void guardarEnHistorial(Libro libro) {
         return;
     }
 
-    fprintf(archivo, "%s,%s,%s\n",
+    fprintf(archivo, "%s, %s, %s\n",
             libro.codigo,
             libro.nombre,
             libro.autor);
@@ -217,7 +213,7 @@ void eliminarLibroInventario(Inventario** inventario, char* codigo) {
  * Entradas: Inventario* inventario
  * Retorno: ninguno
  */
-void cargaInventarioLotesArchivo(Inventario* inventario) {
+void cargaInventarioPorArchivo(Inventario* inventario) {
     FILE* archivo = fopen("Data/Carga.txt", "r");
     if (!archivo) {
         perror("No se pudo abrir el archivo");
@@ -272,7 +268,7 @@ void cargaInventarioLotesArchivo(Inventario* inventario) {
  * Entradas: Inventario** inventario
  * Retorno: ninguno
  */
-void cargarInventario(Inventario** inventario) {
+void cargarInventarioDesdeArchivo(Inventario** inventario) {
     FILE* archivo = fopen("Data/Inventario.txt", "r");
     if (archivo == NULL) {
         perror("Error al abrir el archivo");
@@ -342,5 +338,8 @@ char* lecturaD() {
 
     return string;
 }
+
+
+
 
 #endif // !INVENTARIO

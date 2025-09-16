@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include "Headers/Inventario.h"
 #include "Headers/Menus.h"
@@ -9,7 +10,7 @@ int main()
 	Inventario* inventario = NULL;
 	Pedido* pedidoActual = NULL;
 	Pedido* listaFacturas = NULL;
-	cargarInventario(&inventario);
+	cargarInventarioDesdeArchivo(&inventario);
 	cargarFacturas(&listaFacturas);
 	Config info = leer_config();
 	//imprimirFacturas(listaFacturas);
@@ -43,7 +44,6 @@ int main()
 		case 4:
 			printf("Saliendo del programa...\n");
 			liberarFacturas(listaFacturas);
-			liberarInventario(inventario);
 			liberarPedido(pedidoActual);
 		
 			salir = 1;
